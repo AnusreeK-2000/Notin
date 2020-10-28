@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Notin\'</string>
+    <string name="slogan_name">One place for all your notes!</string>
+
+    <!-- Strings for On Boarding Screen -->
+
+    <!--Titles-->
+    <string name="first_slide_title">Are you a Student?</string>
+    <string name="second_slide_title">Are you a Teacher?</string>
+
+    <!--Descriptions-->
+    <string name="first_slide_desc">You can view and upload notes as per your department and semester as well as create your own notes. </string>
+    <string name="second_slide_desc">You can view the notes available as per your department as well as upload your notes.</string>
+
+    <!--Buttons-->
+    <string name="next_btn">Next</string>
+    <string name="let_get_started">Lets Get Started</string>
+
+    <!-- Menu items -->
+    <string name="menu_home">Home</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_upload">Upload</string>
+    <string name="your_notes">Your Notes</string>
+    <string name="create_notes">Create Note</string>
+</resources>

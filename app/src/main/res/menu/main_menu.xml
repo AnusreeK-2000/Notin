@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/menu_home" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_user"
+            android:title="@string/menu_profile" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ic_logout"
+            android:title="@string/menu_logout" />
+        <item
+            android:id="@+id/nav_upload"
+            android:icon="@drawable/ic_cloud_upload_24px"
+            android:title="@string/menu_upload" />
+
+    </group>
+    <item android:title="Private">
+        <group android:checkableBehavior="single">
+            <menu>
+                <item
+                    android:id="@+id/your_notes"
+                    android:icon="@drawable/ic_note"
+                    android:title="@string/your_notes" />
+                <item
+                    android:id="@+id/create_note"
+                    android:icon="@drawable/ic_create_note"
+                    android:title="@string/create_notes" />
+
+            </menu>
+        </group>
+    </item>
+
+</menu>
