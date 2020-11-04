@@ -53,7 +53,8 @@ public class OnBoarding extends AppCompatActivity {
     }
 
     public void getStarted(View view) {
-        startActivity(new Intent(this, Home.class));
+        //startActivity(new Intent(this, Home.class));
+        startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 
