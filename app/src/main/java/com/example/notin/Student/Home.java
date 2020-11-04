@@ -70,18 +70,18 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
-        switch(id)
-        {
+        switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(this, LoginActivity.class));
-                finish();
+                break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
-                finish();
+                break;
             default:
                 return true;
         }
+        return true;
 
     }
 }
