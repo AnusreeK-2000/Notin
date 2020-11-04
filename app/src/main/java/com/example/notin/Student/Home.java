@@ -75,8 +75,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            case R.id.nav_profile:
+                startActivity(new Intent(this, UpdateProfile.class));
+                finish();
             default:
                 return true;
         }
+
     }
 }
