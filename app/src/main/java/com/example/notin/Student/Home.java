@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -66,12 +68,20 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
+
+        int id = item.getItemId();
+        switch(id)
+        {
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 finish();
+            default:
+                return true;
         }
 
-        return true;
     }
 }
