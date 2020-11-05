@@ -11,6 +11,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,5 +51,15 @@ dependencies {
 
     //pdfViewer Library
     implementation "com.github.barteksc:android-pdf-viewer:2.8.2"
+
+    //firestore
+
+    implementation "com.google.firebase:firebase-firestore:11.4.2"
+    implementation "com.firebaseui:firebase-ui-auth:3.0.0"
+    implementation "com.firebaseui:firebase-ui-firestore:3.0.0"
+
+//    //binding
+//    implementation 'com.jakewharton:butterknife:10.2.3'
+//    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 
 }
