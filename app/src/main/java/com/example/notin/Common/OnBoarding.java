@@ -4,19 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.example.notin.HelperClasses.SliderAdapter;
-import com.example.notin.R;
 import com.example.notin.Student.Home;
+import com.example.notin.adapters.SliderAdapter;
+import com.example.notin.R;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
-import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,8 +50,8 @@ public class OnBoarding extends AppCompatActivity {
     }
 
     public void getStarted(View view) {
-        //startActivity(new Intent(this, Home.class));
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, Home.class));
+        //startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 
