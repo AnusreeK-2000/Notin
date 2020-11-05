@@ -19,7 +19,7 @@
         <activity
             android:name=".Student.CreateNoteActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Student.pdfViewerActivity" />
         <activity android:name=".Student.UploadNotesActivity" />
         <activity android:name=".Common.OnBoarding" />
