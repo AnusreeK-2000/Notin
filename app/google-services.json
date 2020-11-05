@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "599342272469-2t1snqvcdb2co0p1163ihci27s1ja02t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.notin",
+            "certificate_hash": "49461b72a164f20bdef0da19d863994c9d7b0f8f"
+          }
+        },
+        {
           "client_id": "599342272469-92o03vjtiqvt8sjlb7mjinf22898ctpc.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -23,7 +31,6 @@
           }
         },
         {
-
           "client_id": "599342272469-qllbbdkck3sptr1vapmfuhacf80i30rv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
