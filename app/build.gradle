@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.example.notin"
         minSdkVersion 17
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -27,14 +27,28 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.room:room-runtime:2.2.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
     implementation "com.google.android.material:material:1.2.0-alpha02"
+    //recyclerview
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+
+    //scalable size unit(for different screen sizes)
+    implementation "com.intuit.sdp:sdp-android:1.0.6"
+    implementation "com.intuit.ssp:ssp-android:1.0.6"
 
     //--for google signin
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
+
+    //rounded ImageView
+    implementation "com.makeramen:roundedimageview:2.3.0"
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
+
+    //pdfViewer Library
+    implementation "com.github.barteksc:android-pdf-viewer:2.8.2"
 
 }

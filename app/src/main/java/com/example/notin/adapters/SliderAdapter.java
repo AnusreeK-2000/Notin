@@ -1,4 +1,4 @@
-package com.example.notin.HelperClasses;
+package com.example.notin.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

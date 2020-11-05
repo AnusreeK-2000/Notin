@@ -78,6 +78,16 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;
+            case R.id.nav_upload:
+                startActivity(new Intent(this,UploadActivity.class));
+                break;
+            case R.id.your_notes:
+                startActivity(new Intent(this,MainActivity.class));
+                break;
+            case R.id.create_note:
+                startActivity(new Intent(this,CreateNoteActivity.class));
+                break;
+
             default:
                 return true;
         }

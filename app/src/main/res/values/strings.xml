@@ -2,6 +2,19 @@
     <string name="app_name">Notin\'</string>
     <string name="slogan_name">One place for all your notes!</string>
 
+    <string name="my_notes">My Notes</string>
+    <string name="search_notes">Search Notes</string>
+    <string name="each_subj">Subject 1</string>
+
+    <string-array name="Subjects">
+        <item>Algorithms</item>
+        <item>Data Structures</item>
+        <item>Operation Systems</item>
+        <item>Java</item>
+        <item>Artificial Intelligence</item>
+    </string-array>
+
+
     <!-- Strings for On Boarding Screen -->
 
     <!--Titles-->
@@ -23,5 +36,5 @@
     <string name="menu_upload">Upload</string>
     <string name="your_notes">Your Notes</string>
     <string name="create_notes">Create Note</string>
-<!--    <string name="default_web_client_id">100</string>-->
+    <!--    <string name="default_web_client_id">100</string>-->
 </resources>
