@@ -78,6 +78,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
 
         //--for google sign in
+        mAuth = FirebaseAuth.getInstance();
         createRequest();
         findViewById(R.id.googleLoginBtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,12 +226,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
 //        if(mAuth.getCurrentUser() != null) {
-//            FirebaseUser currentUser = mAuth.getCurrentUser();
-//            if (currentUser != null) {
-//                startActivity(new Intent(this, Home.class));
-//            }
-//        }
-    }
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                startActivity(new Intent(this, Home.class));
+            }
+        }
+
 
     //------------------------------- End Google Sign in --------------------------------//
 
