@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,8 +16,24 @@ import android.widget.ImageView;
 
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.adapters.CoursesAdapter;
+import com.example.notin.adapters.RecentNotesAdapter;
+import com.example.notin.entities.Courses;
+import com.example.notin.entities.RecentNotes;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+
+
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+
+import java.util.ArrayList;
+
+//import butterknife.BindView;
+//import butterknife.ButterKnife;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -26,11 +44,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     DrawerLayout drawerLayout;
     NavigationView navigationView;
 
+    RecyclerView  recentNotesRecycler, coursesRecycler;
+//    private FirebaseFirestore db;
+    RecyclerView.Adapter adapter;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_home);
+
+//        db = FirebaseFirestore.getInstance();
 
         //Menu Hooks
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -39,7 +65,58 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
 
         navigationDrawer();
+
+        //Hooks
+        recentNotesRecycler = findViewById(R.id.recent_notes_view);
+        coursesRecycler = findViewById(R.id.courses_view);
+
+        //Functions will be executed automatically when this activity will be created
+
+        recentNotesRecycler();
+        coursesRecycler();
+
+
     }
+
+    private void recentNotesRecycler(){
+        ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
+        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
+        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
+        recentNotesHelperClasses.add(new RecentNotes("Process"));
+        recentNotesHelperClasses.add(new RecentNotes("Software Requirement"));
+        recentNotesHelperClasses.add(new RecentNotes("Shell commands"));
+        recentNotesHelperClasses.add(new RecentNotes("Risk Analysis"));
+//        Query query = db.collection("Notes");
+//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
+//                .setQuery(query, RecentNotes.class)
+//                .build();
+        recentNotesRecycler.setHasFixedSize(true);
+        adapter = new RecentNotesAdapter(recentNotesHelperClasses);
+        recentNotesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recentNotesRecycler.setAdapter(adapter);
+    }
+
+    private void coursesRecycler(){
+        ArrayList<Courses> coursesHelperClasses = new ArrayList<>();
+        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
+        coursesHelperClasses.add(new Courses("Computer Networks"));
+        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
+        coursesHelperClasses.add(new Courses("Advanced Algorithms"));
+        coursesHelperClasses.add(new Courses("Artificial Intelligence"));
+        coursesHelperClasses.add(new Courses("Software Engineering"));
+        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
+
+//        Query query = db.collection("Notes");
+//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
+//                .setQuery(query, RecentNotes.class)
+//                .build();
+        coursesRecycler.setHasFixedSize(true);
+        adapter = new CoursesAdapter(coursesHelperClasses);
+        coursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        coursesRecycler.setAdapter(adapter);
+    }
+
+
 
     //Navigation Drawer Functions
     private void navigationDrawer() {
