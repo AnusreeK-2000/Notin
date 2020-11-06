@@ -4,7 +4,7 @@
 
     <string name="my_notes">My Notes</string>
     <string name="search_notes">Search Notes</string>
-    <string name="each_subj">Subject 1</string>
+    <string name="each_subj">Course 1</string>
 
     <string-array name="Subjects">
         <item>Algorithms</item>
