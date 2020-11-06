@@ -10,17 +10,20 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class UpdateProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     //Variables
     ImageView menuIcon;
-
+    private FirebaseAuth mAuth;
     //Drawer Menu
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -35,8 +38,29 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
 
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
 
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        if(currentUser.getDisplayName().toString() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+        }else{
+            tv_username.setText("Hello User!");
+        }
+        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+        if(currentUser.getPhotoUrl() != null){
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
+        updateProfile();
         navigationDrawer();
+
+    }
+
+    private void updateProfile() {
+
 
     }
 

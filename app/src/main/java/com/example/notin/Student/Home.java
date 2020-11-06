@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.example.notin.adapters.CoursesAdapter;
@@ -80,12 +81,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         recentNotesRecycler();
         coursesRecycler();
-        
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
-        Toast.makeText(this, currentUser.getDisplayName(), Toast.LENGTH_SHORT).show();
-        View inflatedView = getLayoutInflater().inflate(R.layout.menu_header, null);
-        TextView tv_username = (TextView) inflatedView.findViewById(R.id.nav_username);
-        tv_username.setText(currentUser.getDisplayName().toString());
+
 
     }
 
@@ -131,6 +127,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     //Navigation Drawer Functions
     private void navigationDrawer() {
+
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        if(currentUser.getDisplayName().toString() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+        }else{
+            tv_username.setText("Hello User!");
+        }
+        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+        if(currentUser.getPhotoUrl() != null){
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
+        //
+
 
         //Navigation Drawer
         navigationView.bringToFront();
