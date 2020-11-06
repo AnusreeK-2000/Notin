@@ -40,7 +40,7 @@ import java.util.ArrayList;
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener{
 
     private FirebaseAuth mAuth;
 
@@ -122,7 +122,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 //                .setQuery(query, RecentNotes.class)
 //                .build();
         coursesRecycler.setHasFixedSize(true);
-        adapter = new CoursesAdapter(coursesHelperClasses);
+        adapter = new CoursesAdapter(coursesHelperClasses, this);
         coursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         coursesRecycler.setAdapter(adapter);
     }
@@ -184,6 +184,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 return true;
         }
         return true;
+
+    }
+
+    @Override
+    public void onCourseClick(int position) {
+        Intent intent = new Intent(this, UploadNotesActivity.class);
+        startActivity(intent);
+
 
     }
 }
