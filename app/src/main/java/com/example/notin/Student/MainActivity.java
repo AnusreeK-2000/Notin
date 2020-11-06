@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.example.notin.adapters.NotesAdapter;
@@ -24,6 +26,7 @@ import com.example.notin.entities.Note;
 import com.example.notin.listeners.NotesListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
     private NotesAdapter notesAdapter;
 
     private int noteClickedPosition = -1;
+
+    private FirebaseAuth mAuth;
 
     //Variables
     ImageView menuIcon;
@@ -73,6 +78,22 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
             }
         });
         */
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        if(currentUser.getDisplayName().toString() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+        }else{
+            tv_username.setText("Hello User!");
+        }
+        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+        if(currentUser.getPhotoUrl() != null){
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
 
         ImageView imageAddNoteMain = findViewById(R.id.imageAddNotes);
         imageAddNoteMain.setOnClickListener(new View.OnClickListener() {

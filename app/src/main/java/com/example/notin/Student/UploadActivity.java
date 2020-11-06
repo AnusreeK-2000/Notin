@@ -18,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 
+import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -53,9 +54,14 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
 
     private Button Confirm;
     private EditText Title;
+
+    private ImageView info;
+    private FirebaseAuth mAuth;
+
     private Button selectFile;
     TextView Notification;
     String text;
+
 
     FirebaseStorage storage;//To upload files
     FirebaseDatabase database;// Used to store URLs of Uploaded files
@@ -91,6 +97,9 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
 
         navigationDrawer();
 
+
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+
         //Storage in firebase database
 
         storage=FirebaseStorage.getInstance();//returns an obj of firebase storage
@@ -99,6 +108,21 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         selectFile=findViewById(R.id.upload_btn);
 
 
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        if(currentUser.getDisplayName().toString() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+        }else{
+            tv_username.setText("Hello User!");
+        }
+        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+        if(currentUser.getPhotoUrl() != null){
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
 
         /*FOR NOW ACCESSING CREATE VIA CLICKING CANCEL BUTTON
         Button btn = (Button)findViewById(R.id.Cancel_btn);
