@@ -63,7 +63,7 @@ public class SplashScreen extends AppCompatActivity {
 
                     editor.putBoolean("firstTime", firstTime);
                     editor.apply();
-                    Intent intent = new Intent(getApplicationContext(), Home.class);
+                    Intent intent = new Intent(getApplicationContext(), OnBoarding.class);
                     startActivity(intent);
                     finish();
                 }
@@ -71,7 +71,7 @@ public class SplashScreen extends AppCompatActivity {
 
         }
         else{
-            Intent intent = new Intent(getApplicationContext(), OnBoarding.class);
+            Intent intent = new Intent(getApplicationContext(), Home.class);
             startActivity(intent);
             finish();
         }
