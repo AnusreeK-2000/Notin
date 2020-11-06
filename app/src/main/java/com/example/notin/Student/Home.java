@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
@@ -22,13 +24,16 @@ import com.example.notin.entities.Courses;
 import com.example.notin.entities.RecentNotes;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
+//import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+//import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+//import com.google.firebase.firestore.FirebaseFirestore;
+//import com.google.firebase.firestore.FirebaseFirestoreException;
+//import com.google.firebase.firestore.Query;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -36,6 +41,8 @@ import java.util.ArrayList;
 //import butterknife.ButterKnife;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private FirebaseAuth mAuth;
 
     //Variables
     ImageView menuIcon;
@@ -63,7 +70,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
 
-
         navigationDrawer();
 
         //Hooks
@@ -74,7 +80,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         recentNotesRecycler();
         coursesRecycler();
-
+        
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+        Toast.makeText(this, currentUser.getDisplayName(), Toast.LENGTH_SHORT).show();
+        View inflatedView = getLayoutInflater().inflate(R.layout.menu_header, null);
+        TextView tv_username = (TextView) inflatedView.findViewById(R.id.nav_username);
+        tv_username.setText(currentUser.getDisplayName().toString());
 
     }
 
@@ -120,6 +131,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     //Navigation Drawer Functions
     private void navigationDrawer() {
+
         //Navigation Drawer
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
@@ -163,6 +175,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 break;
             case R.id.create_note:
                 startActivity(new Intent(this,CreateNoteActivity.class));
+                break;
+            case R.id.nav_home:
+                startActivity(new Intent(this, Home.class));
                 break;
 
             default:

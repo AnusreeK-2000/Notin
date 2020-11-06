@@ -1,16 +1,25 @@
 package com.example.notin.Student;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+
+import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,12 +31,19 @@ import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class UploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class UploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Button Confirm;
     private Button Cancel;
     private EditText Title;
     private ImageView info;
+
+    //Variables
+    ImageView menuIcon;
+
+    //Drawer Menu
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
 
 
     @Override
@@ -41,6 +57,13 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+
+        //Menu Hooks
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        menuIcon = findViewById(R.id.menu_icon);
+
+        navigationDrawer();
 
 
 
@@ -56,11 +79,11 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         //To disable confirm and cancel
         Confirm=findViewById(R.id.confirm_btn);
         Title=findViewById(R.id.TitleText);
-        Cancel=findViewById(R.id.Cancel_btn);
+//        Cancel=findViewById(R.id.Cancel_btn);
         Title.addTextChangedListener(TitleEntry);
         Confirm.setEnabled(false);
-        Cancel.setEnabled(false);
-    }
+//        Cancel.setEnabled(false);
+   }
 
     //Text watcher to disable button
     private TextWatcher TitleEntry = new TextWatcher() {
@@ -68,10 +91,10 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             if (s.toString().equals("")) {
                 Confirm.setEnabled(false);
-                Cancel.setEnabled(false);
+                //Cancel.setEnabled(false);
             } else {
                 Confirm.setEnabled(true);
-                Cancel.setEnabled(true);
+                //Cancel.setEnabled(true);
             }
         }
 
@@ -100,6 +123,64 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    //Navigation Drawer Functions
+    private void navigationDrawer() {
+
+        //Navigation Drawer
+        navigationView.bringToFront();
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_home);
+
+        menuIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (drawerLayout.isDrawerVisible(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerVisible(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else
+            super.onBackPressed();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
+            case R.id.nav_profile:
+                startActivity(new Intent(this, UpdateProfile.class));
+                break;
+            case R.id.nav_upload:
+                startActivity(new Intent(this,UploadActivity.class));
+                break;
+            case R.id.your_notes:
+                startActivity(new Intent(this,MainActivity.class));
+                break;
+            case R.id.create_note:
+                startActivity(new Intent(this,CreateNoteActivity.class));
+                break;
+            case R.id.nav_home:
+                startActivity(new Intent(this, Home.class));
+                break;
+
+            default:
+                return true;
+        }
+        return true;
 
     }
 
