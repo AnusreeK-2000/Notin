@@ -1,11 +1,18 @@
 package com.example.notin.Student;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -14,9 +21,18 @@ import android.content.Intent;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,11 +53,23 @@ import android.widget.Toast;
 public class UploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Button Confirm;
-    private Button Cancel;
     private EditText Title;
+
     private ImageView info;
     private FirebaseAuth mAuth;
 
+    private Button selectFile;
+    TextView Notification;
+    String text;
+
+
+    FirebaseStorage storage;//To upload files
+    FirebaseDatabase database;// Used to store URLs of Uploaded files
+    Uri pdfUri;//urls meant for local storage
+
+    //database references
+
+    ProgressDialog progressDialog;
     //Variables
     ImageView menuIcon;
 
@@ -69,7 +97,17 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
 
         navigationDrawer();
 
+
         FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+
+        //Storage in firebase database
+
+        storage=FirebaseStorage.getInstance();//returns an obj of firebase storage
+        database=FirebaseDatabase.getInstance();//returns an obj of Firebase Database
+
+        selectFile=findViewById(R.id.upload_btn);
+
+
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
@@ -102,7 +140,140 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         Title.addTextChangedListener(TitleEntry);
         Confirm.setEnabled(false);
 //        Cancel.setEnabled(false);
-   }
+
+        selectFile=findViewById(R.id.upload_btn);
+        Notification=findViewById(R.id.textView);
+
+        //Add file button listener
+        selectFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(ContextCompat.checkSelfPermission(UploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){
+                    selectPdf();
+                }
+                else{
+                    ActivityCompat.requestPermissions(UploadActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},9);
+                }
+            }
+        });
+
+        //Onclick listener of Upload button
+        Confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(pdfUri!=null)//the user has selected file
+                    uploadFile(pdfUri);
+                else
+                    Toast.makeText(UploadActivity.this,"Select a file",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        text = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
+    }
+    //For the spinner
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Toast.makeText(parent.getContext(), " Nothing    ", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    //Function to upload file to firebase database
+
+    private void uploadFile(Uri pdfUri){
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setTitle("Uploading...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.show();
+
+
+        //final String fileName=System.currentTimeMillis()+"";
+        StorageReference storageReference=storage.getReference().child("Uploads/"+System.currentTimeMillis()+".pdf");//returns root path
+        storageReference.putFile(pdfUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        Task<Uri>uri=taskSnapshot.getStorage().getDownloadUrl();
+                        while(!uri.isComplete());
+                        Uri url =uri.getResult();
+
+                        UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text);
+
+                        database.getReference().child(database.getReference().push().getKey()).setValue(details);
+                        progressDialog.dismiss();
+                        Toast.makeText(UploadActivity.this,"File successfully uploaded",Toast.LENGTH_SHORT).show();
+                        Notification.setText("Nothing Uploaded");
+                        Title.setText("");
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(UploadActivity.this,"File not successfully uploaded",Toast.LENGTH_SHORT).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                //track the progress of the upload
+                int currentProgress=(int)(100*snapshot.getBytesTransferred()/snapshot.getTotalByteCount());
+                progressDialog.setProgress(currentProgress);
+
+            }
+        });
+
+    }
+
+
+    //Checking for grant of permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==9 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+            selectPdf();
+        }
+        else{
+            Toast.makeText(UploadActivity.this,"Permission not provided",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //Pdf selecting function
+
+    private void selectPdf(){
+
+        //to offer user to select a file using file manager, using an intent
+
+        Intent intent=new Intent();
+        intent.setType("application/pdf");//setting type as pdf
+        intent.setAction(Intent.ACTION_GET_CONTENT);//fetch files
+
+        startActivityForResult(intent,90);
+
+    }
+
+    //overriding onActivityResult to check if user has successfully selected a file
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //resultcode to check if action is completed successfully
+        //data to check if file is selected or not
+        if(requestCode==90 && resultCode==RESULT_OK && data!=null){
+            pdfUri=data.getData();
+            Notification.setText("File selected: "+data.getData().getLastPathSegment());
+        }
+        else{
+            Toast.makeText(UploadActivity.this,"Please select a file",Toast.LENGTH_SHORT).show();
+        }
+    }
 
     //Text watcher to disable button
     private TextWatcher TitleEntry = new TextWatcher() {
@@ -129,21 +300,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     };
 
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String text = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
-    }
-    //For the spinner
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        Toast.makeText(parent.getContext(), " Nothing    ", Toast.LENGTH_SHORT).show();
-    }
 
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
 
     //Navigation Drawer Functions
     private void navigationDrawer() {
