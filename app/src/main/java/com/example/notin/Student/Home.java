@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
+import com.example.notin.Common.OnBoarding;
 import com.example.notin.R;
 import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.RecentNotesAdapter;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener{
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener {
 
     private FirebaseAuth mAuth;
 
@@ -52,11 +55,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     DrawerLayout drawerLayout;
     NavigationView navigationView;
 
-    RecyclerView  recentNotesRecycler, coursesRecycler;
-//    private FirebaseFirestore db;
+    RecyclerView recentNotesRecycler, coursesRecycler;
+    //    private FirebaseFirestore db;
     RecyclerView.Adapter adapter;
+    Boolean firstTime;
 
-
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
+
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        //firstTime = sharedPreferences.getBoolean("firstTime", true);
 
         navigationDrawer();
 
@@ -85,7 +92,29 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-    private void recentNotesRecycler(){
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        if (currentUser.getDisplayName() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+        } else {
+            tv_username.setText("Hello User!");
+        }
+        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+        if (currentUser.getPhotoUrl() != null) {
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
+    }
+
+    private void recentNotesRecycler() {
         ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
         recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
         recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
@@ -103,7 +132,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         recentNotesRecycler.setAdapter(adapter);
     }
 
-    private void coursesRecycler(){
+    private void coursesRecycler() {
         ArrayList<Courses> coursesHelperClasses = new ArrayList<>();
         coursesHelperClasses.add(new Courses("Advanced Data Structures"));
         coursesHelperClasses.add(new Courses("Computer Networks"));
@@ -124,28 +153,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
 
-
     //Navigation Drawer Functions
     private void navigationDrawer() {
-
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
-
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        View header = navigationView.getHeaderView(0);
-        TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
-            tv_username.setText(currentUser.getDisplayName());
-        }else{
-            tv_username.setText("Hello User!");
-        }
-        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
-        if(currentUser.getPhotoUrl() != null){
-            String imgurl = currentUser.getPhotoUrl().toString();
-            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
-            Glide.with(this).load(imgurl).into(iv_userphoto);
-        }
-        //
-
 
         //Navigation Drawer
         navigationView.bringToFront();
@@ -177,19 +186,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, LoginActivity.class));
+                //startActivity(new Intent(this, LoginActivity.class));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                firstTime = true;
+                editor.putBoolean("firstTime", firstTime);
+                editor.apply();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;
             case R.id.nav_upload:
-                startActivity(new Intent(this,UploadActivity.class));
+                startActivity(new Intent(this, UploadActivity.class));
                 break;
             case R.id.your_notes:
-                startActivity(new Intent(this,MainActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 break;
             case R.id.create_note:
-                startActivity(new Intent(this,CreateNoteActivity.class));
+                startActivity(new Intent(this, CreateNoteActivity.class));
                 break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));

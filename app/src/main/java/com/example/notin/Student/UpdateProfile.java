@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -27,6 +28,7 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
     //Drawer Menu
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +40,12 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
 
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
+        currentUser = mAuth.getInstance().getCurrentUser();
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
+        if(currentUser.getDisplayName() != "") {
             tv_username.setText(currentUser.getDisplayName());
         }else{
             tv_username.setText("Hello User!");
@@ -61,6 +63,29 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
 
     private void updateProfile() {
 
+        if(currentUser.getPhotoUrl() != null){
+            String imgurl = currentUser.getPhotoUrl().toString();
+            ImageView iv_userphoto = findViewById(R.id.profile_image);
+            Glide.with(this).load(imgurl).into(iv_userphoto);
+        }
+        TextView tv_username = findViewById(R.id.full_name);
+        TextInputEditText user = findViewById(R.id.inputname);
+        if(currentUser.getDisplayName() != "") {
+            tv_username.setText(currentUser.getDisplayName());
+            user.setText(currentUser.getDisplayName());
+        }else{
+            tv_username.setText("Hello User!");
+            user.setText("");
+        }
+        TextView email = findViewById(R.id.email);
+        TextView emailedit = findViewById(R.id.editEmail);
+        if(currentUser.getEmail() != "") {
+            email.setText(currentUser.getEmail());
+            emailedit.setText(currentUser.getEmail());
+        }else{
+            email.setText("");
+            emailedit.setText("");
+        }
 
     }
 

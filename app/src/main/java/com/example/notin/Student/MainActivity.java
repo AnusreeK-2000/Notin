@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
+        if(currentUser.getDisplayName() != "") {
             tv_username.setText(currentUser.getDisplayName());
         }else{
             tv_username.setText("Hello User!");

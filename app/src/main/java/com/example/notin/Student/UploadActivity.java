@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -112,7 +113,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
+        if(currentUser.getDisplayName() != "") {
             tv_username.setText(currentUser.getDisplayName());
         }else{
             tv_username.setText("Hello User!");
@@ -173,7 +174,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         text = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
     }
     //For the spinner
     @Override

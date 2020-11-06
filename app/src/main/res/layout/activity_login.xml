@@ -50,7 +50,7 @@
                     android:fontFamily="@font/lato"
                     android:hint="Mobile Number"
                     android:includeFontPadding="true"
-                    android:inputType="textPersonName"
+                    android:inputType="phone"
                     android:minWidth="150dp"
                     android:padding="10dp"
                     android:textColor="#114411"
