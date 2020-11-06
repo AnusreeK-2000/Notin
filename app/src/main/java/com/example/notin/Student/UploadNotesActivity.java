@@ -1,9 +1,13 @@
 package com.example.notin.Student;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +33,28 @@ public class UploadNotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload_display);
+        //back button
+        ImageView imageBack = findViewById(R.id.home_back);
+        imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(UploadNotesActivity.this,Home.class));
+            }
+        });
+
+        //to upload notes
+        ImageView uploading=findViewById(R.id.uploading);
+        uploading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                startActivity(new Intent(UploadNotesActivity.this,UploadActivity.class));
+            }
+        });
+
+
+
         myListData[] myListData=new myListData[]{
                 new myListData("Unix Unit 1 Notes", "Vikranth B.M"),
         new myListData("Computer Networks Unit 3 Notes", "Lohit J.J"),
