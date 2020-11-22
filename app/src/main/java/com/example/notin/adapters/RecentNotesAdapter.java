@@ -34,7 +34,7 @@ public class RecentNotesAdapter extends RecyclerView.Adapter<RecentNotesAdapter.
     public void onBindViewHolder(@NonNull RecentNotesHolder holder, int position) {
         RecentNotes helperClass = recentNotesList.get(position);
 
-        holder.textView.setText(helperClass.getTitle());
+        holder.textView.setText(helperClass.getName());
     }
 
     @Override
