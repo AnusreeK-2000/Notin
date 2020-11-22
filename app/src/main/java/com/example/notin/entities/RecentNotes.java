@@ -4,21 +4,41 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
 public class RecentNotes {
-    private String title;
+    private String name;
+    private int sem;
+    private String subject;
 
     public RecentNotes() {
     }
 
-    public RecentNotes(String title) {
-        this.title = title;
+    public RecentNotes(String name, int sem, String subject) {
+        this.name = name;
+        this.sem = sem;
+        this.subject = subject;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getSem() {
+        return sem;
+    }
+
+    public void setSem(int sem) {
+        this.sem = sem;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }
 

@@ -26,6 +26,11 @@ import com.example.notin.entities.RecentNotes;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 //import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -86,41 +91,88 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void recentNotesRecycler(){
-        ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
-        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
-        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
-        recentNotesHelperClasses.add(new RecentNotes("Process"));
-        recentNotesHelperClasses.add(new RecentNotes("Software Requirement"));
-        recentNotesHelperClasses.add(new RecentNotes("Shell commands"));
-        recentNotesHelperClasses.add(new RecentNotes("Risk Analysis"));
-//        Query query = db.collection("Notes");
+        final ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
+//        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
+//        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
+//        recentNotesHelperClasses.add(new RecentNotes("Process"));
+//        recentNotesHelperClasses.add(new RecentNotes("Software Requirement"));
+//        recentNotesHelperClasses.add(new RecentNotes("Shell commands"));
+//        recentNotesHelperClasses.add(new RecentNotes("Risk Analysis"));
+////        Query query = db.collection("Notes");
 //        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
 //                .setQuery(query, RecentNotes.class)
 //                .build();
+        final DatabaseReference nm= FirebaseDatabase.getInstance().getReference().child("Notes");
+        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    for (DataSnapshot npsnapshot : dataSnapshot.getChildren()){
+                        RecentNotes l=npsnapshot.getValue(RecentNotes.class);
+                        recentNotesHelperClasses.add(l);
+                    }
+//                                                      adapter=new MyAdapter(listData);
+//                                                      rv.setAdapter(adapter);
+                    adapter = new RecentNotesAdapter(recentNotesHelperClasses);
+                    recentNotesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.HORIZONTAL, false));
+                    recentNotesRecycler.setAdapter(adapter);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         recentNotesRecycler.setHasFixedSize(true);
-        adapter = new RecentNotesAdapter(recentNotesHelperClasses);
-        recentNotesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recentNotesRecycler.setAdapter(adapter);
+//        adapter = new RecentNotesAdapter(recentNotesHelperClasses);
+//        recentNotesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+//        recentNotesRecycler.setAdapter(adapter);
     }
 
     private void coursesRecycler(){
-        ArrayList<Courses> coursesHelperClasses = new ArrayList<>();
-        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
-        coursesHelperClasses.add(new Courses("Computer Networks"));
-        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
-        coursesHelperClasses.add(new Courses("Advanced Algorithms"));
-        coursesHelperClasses.add(new Courses("Artificial Intelligence"));
-        coursesHelperClasses.add(new Courses("Software Engineering"));
-        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
+        final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
+//        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
+//        coursesHelperClasses.add(new Courses("Computer Networks"));
+//        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
+//        coursesHelperClasses.add(new Courses("Advanced Algorithms"));
+//        coursesHelperClasses.add(new Courses("Artificial Intelligence"));
+//        coursesHelperClasses.add(new Courses("Software Engineering"));
+//        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
+
+        final DatabaseReference nm= FirebaseDatabase.getInstance().getReference().child("Courses");
+        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+                                              @Override
+                                              public void onDataChange(DataSnapshot dataSnapshot) {
+                                                  if (dataSnapshot.exists()){
+                                                      for (DataSnapshot npsnapshot : dataSnapshot.getChildren()){
+                                                          Courses l=npsnapshot.getValue(Courses.class);
+                                                          coursesHelperClasses.add(l);
+                                                      }
+//                                                      adapter=new MyAdapter(listData);
+//                                                      rv.setAdapter(adapter);
+                                                      adapter = new CoursesAdapter(coursesHelperClasses, Home.this);
+                                                      coursesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.VERTICAL, false));
+                                                      coursesRecycler.setAdapter(adapter);
+                                                      System.out.println(coursesHelperClasses);
+
+                                                  }
+                                              }
+
+                                              @Override
+                                              public void onCancelled(@NonNull DatabaseError error) {
+
+                                              }
+        });
 
 //        Query query = db.collection("Notes");
+
 //        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
 //                .setQuery(query, RecentNotes.class)
 //                .build();
         coursesRecycler.setHasFixedSize(true);
-        adapter = new CoursesAdapter(coursesHelperClasses, this);
-        coursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        coursesRecycler.setAdapter(adapter);
+
     }
 
 
