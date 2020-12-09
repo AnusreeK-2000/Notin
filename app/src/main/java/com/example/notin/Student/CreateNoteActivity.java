@@ -33,6 +33,7 @@ import com.example.notin.database.NotesDatabase;
 import com.example.notin.entities.Note;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +54,8 @@ public class CreateNoteActivity extends AppCompatActivity {
     int textSize = 1;
     int saveProgress;
 
+    //For camera
+    OutputStream outputStream;
     private View viewTitle;
     private String selectedColor;
 
