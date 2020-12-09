@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,7 +18,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
-import com.example.notin.Common.OnBoarding;
 import com.example.notin.R;
 import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.RecentNotesAdapter;
@@ -29,6 +26,11 @@ import com.example.notin.entities.RecentNotes;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 //import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -44,7 +46,7 @@ import java.util.ArrayList;
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener {
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener{
 
     private FirebaseAuth mAuth;
 
@@ -55,12 +57,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     DrawerLayout drawerLayout;
     NavigationView navigationView;
 
-    RecyclerView recentNotesRecycler, coursesRecycler;
-    //    private FirebaseFirestore db;
+    RecyclerView  recentNotesRecycler, coursesRecycler;
+//    private FirebaseFirestore db;
     RecyclerView.Adapter adapter;
-    Boolean firstTime;
 
-    SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +75,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
-
-        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        //firstTime = sharedPreferences.getBoolean("firstTime", true);
 
         navigationDrawer();
 
@@ -92,69 +90,114 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void recentNotesRecycler(){
+        final ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
+//        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
+//        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
+//        recentNotesHelperClasses.add(new RecentNotes("Process"));
+//        recentNotesHelperClasses.add(new RecentNotes("Software Requirement"));
+//        recentNotesHelperClasses.add(new RecentNotes("Shell commands"));
+//        recentNotesHelperClasses.add(new RecentNotes("Risk Analysis"));
+////        Query query = db.collection("Notes");
+//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
+//                .setQuery(query, RecentNotes.class)
+//                .build();
+        final DatabaseReference nm= FirebaseDatabase.getInstance().getReference().child("Notes");
+        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    for (DataSnapshot npsnapshot : dataSnapshot.getChildren()){
+                        RecentNotes l=npsnapshot.getValue(RecentNotes.class);
+                        recentNotesHelperClasses.add(l);
+                    }
+//                                                      adapter=new MyAdapter(listData);
+//                                                      rv.setAdapter(adapter);
+                    adapter = new RecentNotesAdapter(recentNotesHelperClasses);
+                    recentNotesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.HORIZONTAL, false));
+                    recentNotesRecycler.setAdapter(adapter);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        recentNotesRecycler.setHasFixedSize(true);
+//        adapter = new RecentNotesAdapter(recentNotesHelperClasses);
+//        recentNotesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+//        recentNotesRecycler.setAdapter(adapter);
+    }
+
+    private void coursesRecycler(){
+        final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
+//        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
+//        coursesHelperClasses.add(new Courses("Computer Networks"));
+//        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
+//        coursesHelperClasses.add(new Courses("Advanced Algorithms"));
+//        coursesHelperClasses.add(new Courses("Artificial Intelligence"));
+//        coursesHelperClasses.add(new Courses("Software Engineering"));
+//        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
+
+        final DatabaseReference nm= FirebaseDatabase.getInstance().getReference().child("Courses");
+        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+                                              @Override
+                                              public void onDataChange(DataSnapshot dataSnapshot) {
+                                                  if (dataSnapshot.exists()){
+                                                      for (DataSnapshot npsnapshot : dataSnapshot.getChildren()){
+                                                          Courses l=npsnapshot.getValue(Courses.class);
+                                                          coursesHelperClasses.add(l);
+                                                      }
+//                                                      adapter=new MyAdapter(listData);
+//                                                      rv.setAdapter(adapter);
+                                                      adapter = new CoursesAdapter(coursesHelperClasses, Home.this);
+                                                      coursesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.VERTICAL, false));
+                                                      coursesRecycler.setAdapter(adapter);
+                                                      System.out.println(coursesHelperClasses);
+
+                                                  }
+                                              }
+
+                                              @Override
+                                              public void onCancelled(@NonNull DatabaseError error) {
+
+                                              }
+        });
+
+//        Query query = db.collection("Notes");
+
+//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
+//                .setQuery(query, RecentNotes.class)
+//                .build();
+        coursesRecycler.setHasFixedSize(true);
+
+    }
+
+
+
+    //Navigation Drawer Functions
+    private void navigationDrawer() {
 
         FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
-        if (currentUser.getDisplayName() != "") {
+        if(currentUser.getDisplayName().toString() != "") {
             tv_username.setText(currentUser.getDisplayName());
-        } else {
+        }else{
             tv_username.setText("Hello User!");
         }
         //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
-        if (currentUser.getPhotoUrl() != null) {
+        if(currentUser.getPhotoUrl() != null){
             String imgurl = currentUser.getPhotoUrl().toString();
             ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
             Glide.with(this).load(imgurl).into(iv_userphoto);
         }
-    }
+        //
 
-    private void recentNotesRecycler() {
-        ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
-        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
-        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
-        recentNotesHelperClasses.add(new RecentNotes("Process"));
-        recentNotesHelperClasses.add(new RecentNotes("Software Requirement"));
-        recentNotesHelperClasses.add(new RecentNotes("Shell commands"));
-        recentNotesHelperClasses.add(new RecentNotes("Risk Analysis"));
-//        Query query = db.collection("Notes");
-//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
-//                .setQuery(query, RecentNotes.class)
-//                .build();
-        recentNotesRecycler.setHasFixedSize(true);
-        adapter = new RecentNotesAdapter(recentNotesHelperClasses);
-        recentNotesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recentNotesRecycler.setAdapter(adapter);
-    }
-
-    private void coursesRecycler() {
-        ArrayList<Courses> coursesHelperClasses = new ArrayList<>();
-        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
-        coursesHelperClasses.add(new Courses("Computer Networks"));
-        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
-        coursesHelperClasses.add(new Courses("Advanced Algorithms"));
-        coursesHelperClasses.add(new Courses("Artificial Intelligence"));
-        coursesHelperClasses.add(new Courses("Software Engineering"));
-        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
-
-//        Query query = db.collection("Notes");
-//        FirestoreRecyclerOptions<RecentNotes> recentNotesHelperClasses = new FirestoreRecyclerOptions.Builder<RecentNotes>()
-//                .setQuery(query, RecentNotes.class)
-//                .build();
-        coursesRecycler.setHasFixedSize(true);
-        adapter = new CoursesAdapter(coursesHelperClasses, this);
-        coursesRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        coursesRecycler.setAdapter(adapter);
-    }
-
-
-    //Navigation Drawer Functions
-    private void navigationDrawer() {
 
         //Navigation Drawer
         navigationView.bringToFront();
@@ -186,25 +229,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                //startActivity(new Intent(this, LoginActivity.class));
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                firstTime = true;
-                editor.putBoolean("firstTime", firstTime);
-                editor.apply();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(this, LoginActivity.class));
                 break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;
             case R.id.nav_upload:
-                startActivity(new Intent(this, UploadActivity.class));
+                startActivity(new Intent(this,UploadActivity.class));
                 break;
             case R.id.your_notes:
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this,MainActivity.class));
                 break;
             case R.id.create_note:
-                startActivity(new Intent(this, CreateNoteActivity.class));
+                startActivity(new Intent(this,CreateNoteActivity.class));
                 break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
