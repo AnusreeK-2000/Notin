@@ -211,12 +211,12 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
 
                         UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text);
 
-                        database.getReference().child(database.getReference().push().getKey()).setValue(details);
+                        database.getReference().child("Notes").child(database.getReference().push().getKey()).setValue(details);
                         progressDialog.dismiss();
                         Toast.makeText(UploadActivity.this,"File successfully uploaded",Toast.LENGTH_SHORT).show();
                         Notification.setText("Nothing Uploaded");
                         Title.setText("");
-
+                        Confirm.setEnabled(false);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -234,6 +234,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         });
 
     }
+
 
 
     //Checking for grant of permissions
