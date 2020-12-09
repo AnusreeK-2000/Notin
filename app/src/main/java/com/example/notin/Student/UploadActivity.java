@@ -215,7 +215,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
                         Toast.makeText(UploadActivity.this,"File successfully uploaded",Toast.LENGTH_SHORT).show();
                         Notification.setText("Nothing Uploaded");
                         Title.setText("");
-
+                        Confirm.setEnabled(false);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -57,9 +57,9 @@ dependencies {
     //pdfViewer Library
     implementation "com.github.barteksc:android-pdf-viewer:2.8.2"
 
-    //firestore
     implementation 'com.github.bumptech.glide:glide:4.11.0'
 
+    //firestore
     implementation "com.google.firebase:firebase-firestore:11.4.2"
     implementation "com.firebaseui:firebase-ui-auth:3.0.0"
     implementation "com.firebaseui:firebase-ui-firestore:3.0.0"

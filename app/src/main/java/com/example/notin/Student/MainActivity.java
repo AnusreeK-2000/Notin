@@ -2,6 +2,7 @@ package com.example.notin.Student;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -45,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
     private int noteClickedPosition = -1;
 
     private FirebaseAuth mAuth;
+
+    Boolean firstTime;
+
+    SharedPreferences sharedPreferences;
 
     //Variables
     ImageView menuIcon;
@@ -221,7 +226,13 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
         switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, LoginActivity.class));
+                //startActivity(new Intent(this, LoginActivity.class));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                firstTime = true;
+                editor.putBoolean("firstTime", firstTime);
+                editor.apply();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
