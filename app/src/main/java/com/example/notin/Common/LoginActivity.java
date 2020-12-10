@@ -246,6 +246,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                         sharedPref.saveString("userSem", itemsem);
 
                                         reference.child(String.valueOf(user.getUid())).setValue(member);
+                                        startActivity(new Intent(getApplicationContext(), UpdateProfile.class));
                                     }else{
                                         String name_f = dataSnapshot.child("name").getValue().toString();
                                         String sem_f = dataSnapshot.child("semester").getValue().toString();
@@ -256,7 +257,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                         sharedPref.saveString("userEmail", email_f);
                                         sharedPref.saveString("userDept", dept_f);
                                         sharedPref.saveString("userSem", sem_f);
+
+                                        startActivity(new Intent(getApplicationContext(), Home.class));
                                     }
+
                                 }
 
                                 @Override
@@ -267,7 +271,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                             userNameRef.addListenerForSingleValueEvent(eventListener);
 
 
-                            startActivity(new Intent(getApplicationContext(), UpdateProfile.class));
+
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -383,6 +387,9 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                         sharedPref.saveString("userDept", itemdept);
 
                                         reference.child(String.valueOf(user.getUid())).setValue(member);
+                                        Intent intent = new Intent(getApplicationContext(), UpdateProfile.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
                                     }else{
                                         String name_f = dataSnapshot.child("name").getValue().toString();
                                         String sem_f = dataSnapshot.child("semester").getValue().toString();
@@ -393,7 +400,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                         sharedPref.saveString("userEmail", email_f);
                                         sharedPref.saveString("userDept", dept_f);
                                         sharedPref.saveString("userSem", sem_f);
+                                        Intent intent = new Intent(getApplicationContext(), Home.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
                                     }
+
                                 }
 
                                 @Override
@@ -403,9 +414,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                             };
                             userNameRef.addListenerForSingleValueEvent(eventListener);
 
-                            Intent intent = new Intent(getApplicationContext(), UpdateProfile.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
+
                         } else {
                             toast(task.getException().getMessage());
                         }
