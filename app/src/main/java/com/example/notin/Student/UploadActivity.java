@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.content.Intent;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Utils.SharedPrefUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -54,10 +57,14 @@ import android.widget.Toast;
 public class UploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Button Confirm;
+
+    Boolean firstTime;
+
+    SharedPrefUtil sharedPref;
+
     private EditText Title;
 
     private ImageView info;
-    private FirebaseAuth mAuth;
 
     private Button selectFile;
     TextView Notification;
@@ -67,6 +74,8 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     FirebaseStorage storage;//To upload files
     FirebaseDatabase database;// Used to store URLs of Uploaded files
     Uri pdfUri;//urls meant for local storage
+    private FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     //database references
 
@@ -91,15 +100,16 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
+        sharedPref = new SharedPrefUtil(UploadActivity.this);
+
         //Menu Hooks
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
-
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
         navigationDrawer();
 
-
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
 
         //Storage in firebase database
 
@@ -111,20 +121,20 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         
 
 
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        View header = navigationView.getHeaderView(0);
-        TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
-            tv_username.setText(currentUser.getDisplayName());
-        }else{
-            tv_username.setText("Hello User!");
-        }
-        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
-        if(currentUser.getPhotoUrl() != null){
-            String imgurl = currentUser.getPhotoUrl().toString();
-            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
-            Glide.with(this).load(imgurl).into(iv_userphoto);
-        }
+//        NavigationView navigationView = findViewById(R.id.navigation_view);
+//        View header = navigationView.getHeaderView(0);
+//        TextView tv_username = header.findViewById(R.id.nav_username);
+//        if(currentUser.getDisplayName() != "") {
+//            tv_username.setText(currentUser.getDisplayName());
+//        }else{
+//            tv_username.setText("Hello User!");
+//        }
+//        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+//        if(currentUser.getPhotoUrl() != null){
+//            String imgurl = currentUser.getPhotoUrl().toString();
+//            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+//            Glide.with(this).load(imgurl).into(iv_userphoto);
+//        }
 
         /*FOR NOW ACCESSING CREATE VIA CLICKING CANCEL BUTTON
         Button btn = (Button)findViewById(R.id.Cancel_btn);
@@ -175,7 +185,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         text = parent.getItemAtPosition(position).toString();
-        Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
     }
     //For the spinner
     @Override
@@ -308,6 +318,28 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     //Navigation Drawer Functions
     private void navigationDrawer() {
 
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        String n = sharedPref.getString("userName");
+        if(currentUser.getDisplayName() != null){
+            if(n != null){
+                tv_username.setText(n);
+            }
+            else if (currentUser.getDisplayName() != "") {
+                tv_username.setText(currentUser.getDisplayName());
+            } else {
+                tv_username.setText("Hello User!");
+            }
+            //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+            if (currentUser.getPhotoUrl() != null) {
+                String imgurl = currentUser.getPhotoUrl().toString();
+                ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+                Glide.with(this).load(imgurl).into(iv_userphoto);
+            }
+        }
+
+
         //Navigation Drawer
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
@@ -338,8 +370,15 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, LoginActivity.class));
-                break;
+                SharedPreferences sharedPreferences = PreferenceManager
+                        .getDefaultSharedPreferences(this);
+                //startActivity(new Intent(this, LoginActivity.class));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                firstTime = true;
+                editor.putBoolean("firstTime", firstTime);
+                editor.apply();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;

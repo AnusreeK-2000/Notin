@@ -26,18 +26,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp">
 
-        <ImageView
-            android:id="@+id/menu_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:src="@drawable/menu_icon" />
+            <ImageView
+                android:id="@+id/menu_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/menu_icon" />
+
+<!--            <TextView-->
+<!--                android:id="@+id/app_name"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:fontFamily="sans-serif-condensed"-->
+<!--                android:text="Profile"-->
+<!--                android:textColor="@color/dark_purple"-->
+<!--                android:textSize="28sp" />-->
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="260dp"
             android:background="@color/lavender"
             android:padding="20dp">
 
@@ -57,10 +73,10 @@
                 android:layout_toRightOf="@+id/profile_image"
                 android:fontFamily="sans-serif-condensed"
                 android:includeFontPadding="false"
-                android:text="Student ABC"
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/full_name"
@@ -69,7 +85,7 @@
                 android:layout_toRightOf="@+id/profile_image"
                 android:fontFamily="sans-serif"
                 android:includeFontPadding="false"
-                android:text="student@gmail.com"
+                android:text=""
                 android:textSize="14sp" />
 
         </RelativeLayout>
@@ -84,14 +100,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="Full Name">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Full Name"
                     android:drawableLeft="@drawable/ic_user"
                     android:drawablePadding="10dp"
-                    android:text="Student ABC" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -99,51 +117,59 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Email">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editEmail"
+                    android:hint="Email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_email"
                     android:drawablePadding="10dp"
-                    android:text="student@gmail.com" />
+                     />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+            <LinearLayout
+                android:layout_marginTop="13dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Department">
-
-                <com.google.android.material.textfield.TextInputEditText
+                android:background="@drawable/background_ls"
+                android:orientation="horizontal">
+                <Spinner
+                    android:id="@+id/spinnerSemPro"
+                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_dept"
-                    android:drawablePadding="10dp"
-                    android:text="Computer Science and Engineering" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="35dp"
+                    android:layout_weight="7"
+                    android:spinnerMode="dropdown" />
+            </LinearLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+
+            <LinearLayout
+                android:layout_marginTop="13dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Semester">
+                android:background="@drawable/background_ls"
+                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <Spinner
+                    android:id="@+id/spinnerDeptPro"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_sem"
-                    android:drawablePadding="10dp"
-                    android:text="5" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="10dp"
+                    android:layout_height="35dp"
+                    android:layout_weight="7"
+                    android:spinnerMode="dropdown" />
+
+              </LinearLayout>
 
 
 
             <Button
+                android:id="@+id/update_profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/purple"
+                android:layout_marginTop="25dp"
                 android:fontFamily="sans-serif-condensed"
                 android:text="Update"
                 android:textColor="#fff"/>

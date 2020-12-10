@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.RecentNotesAdapter;
 import com.example.notin.entities.Courses;
@@ -49,6 +52,7 @@ import java.util.ArrayList;
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener{
 
     private FirebaseAuth mAuth;
+    Boolean firstTime;
 
     //Variables
     ImageView menuIcon;
@@ -61,7 +65,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 //    private FirebaseFirestore db;
     RecyclerView.Adapter adapter;
 
-
+    SharedPrefUtil sharedPref;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         setContentView(R.layout.activity_home);
 
 //        db = FirebaseFirestore.getInstance();
+
+        sharedPref = new SharedPrefUtil(Home.this);
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
 
         //Menu Hooks
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -180,23 +189,27 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     //Navigation Drawer Functions
     private void navigationDrawer() {
 
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
-
         NavigationView navigationView = findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName().toString() != "") {
-            tv_username.setText(currentUser.getDisplayName());
-        }else{
-            tv_username.setText("Hello User!");
+        String n = sharedPref.getString("userName");
+        if(currentUser != null){
+            if(n != null){
+                tv_username.setText(n);
+            }
+            else if (currentUser.getDisplayName() != "") {
+                tv_username.setText(currentUser.getDisplayName());
+            } else {
+                tv_username.setText("Hello User!");
+            }
+            //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+            if (currentUser.getPhotoUrl() != null) {
+                String imgurl = currentUser.getPhotoUrl().toString();
+                ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+                Glide.with(this).load(imgurl).into(iv_userphoto);
+            }
         }
-        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
-        if(currentUser.getPhotoUrl() != null){
-            String imgurl = currentUser.getPhotoUrl().toString();
-            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
-            Glide.with(this).load(imgurl).into(iv_userphoto);
-        }
-        //
+
 
 
         //Navigation Drawer
@@ -229,8 +242,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         switch (id) {
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, LoginActivity.class));
-                break;
+                SharedPreferences sharedPreferences = PreferenceManager
+                        .getDefaultSharedPreferences(this);
+                //startActivity(new Intent(this, LoginActivity.class));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                firstTime = true;
+                editor.putBoolean("firstTime", firstTime);
+                editor.apply();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;

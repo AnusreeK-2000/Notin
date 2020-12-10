@@ -10,8 +10,12 @@
         <item>Algorithms</item>
         <item>Data Structures</item>
         <item>Operation Systems</item>
+        <item>DBMS</item>
         <item>Java</item>
+        <item>Computer Networks</item>
+        <item>Software Engineering</item>
         <item>Artificial Intelligence</item>
+        <item>Other</item>
     </string-array>
 
 
