@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.view.MotionEvent.*;
+
 public class CreateNoteActivity extends AppCompatActivity {
 
     private EditText inputNoteTitle, inputNoteText;
@@ -75,6 +77,23 @@ public class CreateNoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_note);
 
         checkPermission();
+
+        //--scroll desc
+        EditText et = findViewById(R.id.description_text);
+
+        et.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View view, MotionEvent event) {
+                if (view.getId() == R.id.description_text) {
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+                    switch (event.getAction() & ACTION_MASK) {
+                        case ACTION_UP:
+                            view.getParent().requestDisallowInterceptTouchEvent(false);
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
 
 
         //back button
@@ -226,12 +245,12 @@ public class CreateNoteActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_UP:
+                    case ACTION_UP:
                         mSpeechRecognizer.stopListening();
                         inputNoteText.setHint("You will see input here");
                         break;
 
-                    case MotionEvent.ACTION_DOWN:
+                    case ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                         inputNoteText.setText("");
                         inputNoteText.setHint("Listening...");
@@ -392,5 +411,6 @@ public class CreateNoteActivity extends AppCompatActivity {
         GradientDrawable gradientDrawable = (GradientDrawable) viewTitle.getBackground();
         gradientDrawable.setColor((Color.parseColor(selectedColor)));
     }
+
 }
 

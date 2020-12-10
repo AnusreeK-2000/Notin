@@ -2,14 +2,14 @@ package com.example.notin.Student;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.NotesAdapter;
 import com.example.notin.database.NotesDatabase;
 import com.example.notin.entities.Note;
@@ -28,6 +29,11 @@ import com.example.notin.listeners.NotesListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,19 +51,21 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
 
     private int noteClickedPosition = -1;
 
-    private FirebaseAuth mAuth;
-
     Boolean firstTime;
-
-    SharedPreferences sharedPreferences;
 
     //Variables
     ImageView menuIcon;
+
+    SharedPrefUtil sharedPref;
 
     //Drawer Menu
     DrawerLayout drawerLayout;
     NavigationView navigationView;
 
+    String name_f;
+    DatabaseReference reference;
+    private FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +77,14 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
 
+        sharedPref = new SharedPrefUtil(MainActivity.this);
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+
         navigationDrawer();
 
         /*
         enable to view upload notes when clicked on floating action button..
-
         ImageView imageAddNoteMain=findViewById(R.id.imageAddNotes);
         imageAddNoteMain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,22 +94,35 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
             }
         });
         */
-        FirebaseUser currentUser = mAuth.getInstance().getCurrentUser();
 
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        View header = navigationView.getHeaderView(0);
-        TextView tv_username = header.findViewById(R.id.nav_username);
-        if(currentUser.getDisplayName() != "") {
-            tv_username.setText(currentUser.getDisplayName());
-        }else{
-            tv_username.setText("Hello User!");
-        }
-        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
-        if(currentUser.getPhotoUrl() != null){
-            String imgurl = currentUser.getPhotoUrl().toString();
-            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
-            Glide.with(this).load(imgurl).into(iv_userphoto);
-        }
+//        reference = FirebaseDatabase.getInstance().getReference().child("Member");
+//
+//        NavigationView navigationView = findViewById(R.id.navigation_view);
+//        View header = navigationView.getHeaderView(0);
+//        final TextView tv_username = header.findViewById(R.id.nav_username);
+//        reference.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                name_f = snapshot.child("name").getValue().toString();
+//                if(currentUser.getDisplayName().toString() != "") {
+//                    tv_username.setText(name_f);
+//                }else{
+//                    tv_username.setText("Hello User!");
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//
+//        //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+//        if(currentUser.getPhotoUrl() != null){
+//            String imgurl = currentUser.getPhotoUrl().toString();
+//            ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+//            Glide.with(this).load(imgurl).into(iv_userphoto);
+//        }
 
         ImageView imageAddNoteMain = findViewById(R.id.imageAddNotes);
         imageAddNoteMain.setOnClickListener(new View.OnClickListener() {
@@ -160,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
                     notesAdapter.notifyItemInserted(0);
                 }
                 notesRecyclerView.smoothScrollToPosition(0);
-
                  */
                 if (requestCode == REQUEST_CODE_SHOW_ALL_NOTES) {
                     noteList.addAll(notes);
@@ -196,6 +219,28 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
 
     //Navigation Drawer Functions
     private void navigationDrawer() {
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View header = navigationView.getHeaderView(0);
+        TextView tv_username = header.findViewById(R.id.nav_username);
+        String n = sharedPref.getString("userName");
+        if(currentUser != null){
+            if(n != null){
+                tv_username.setText(n);
+            }
+            else if (currentUser.getDisplayName() != "") {
+                tv_username.setText(currentUser.getDisplayName());
+            } else {
+                tv_username.setText("Hello User!");
+            }
+            //String imgurl = currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : null;
+            if (currentUser.getPhotoUrl() != null) {
+                String imgurl = currentUser.getPhotoUrl().toString();
+                ImageView iv_userphoto = header.findViewById(R.id.userPhoto);
+                Glide.with(this).load(imgurl).into(iv_userphoto);
+            }
+        }
+
         //Navigation Drawer
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
@@ -227,13 +272,14 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
                 //startActivity(new Intent(this, LoginActivity.class));
+                SharedPreferences sharedPreferences = PreferenceManager
+                        .getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 firstTime = true;
                 editor.putBoolean("firstTime", firstTime);
                 editor.apply();
                 Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-                break;
+                startActivity(intent);break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
                 break;

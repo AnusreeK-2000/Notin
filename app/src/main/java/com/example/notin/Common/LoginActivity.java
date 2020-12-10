@@ -17,6 +17,9 @@ import android.content.Intent;
 
 import com.example.notin.R;
 import com.example.notin.Student.Home;
+import com.example.notin.Student.UpdateProfile;
+import com.example.notin.Utils.SharedPrefUtil;
+import com.example.notin.entities.Member;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -32,6 +35,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +55,20 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     private FirebaseAuth mAuth;
     EditText et_pno, et_verificationCode;
     String phoneNumber, otp;
-//    String codesent;
+    //    String codesent;
+    DatabaseReference reference;
+    Member member;
+    SharedPrefUtil sharedPref;
+    String itemsem;
+    String itemdept;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        reference = FirebaseDatabase.getInstance().getReference().child("Member");
+        member = new Member();
         //--for mobile sign in
         findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +92,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
+        sharedPref = new SharedPrefUtil(LoginActivity.this);
 
         //--for google sign in
         mAuth = FirebaseAuth.getInstance();
@@ -133,6 +150,9 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         // attaching data adapter to spinner
         spinnerSem.setAdapter(dataAdapterSem);
         spinnerDept.setAdapter(dataAdapterDept);
+
+        itemdept = "Computer Science & Engineering";
+        itemsem = "5";
     }
 
 
@@ -142,11 +162,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
         if (parent.getId() == R.id.spinnerSem) {
             // On selecting a spinner item
-            String item = parent.getItemAtPosition(position).toString();
+            itemsem = parent.getItemAtPosition(position).toString();
 
         } else if (parent.getId() == R.id.spinnerDept) {
             // On selecting a spinner item
-            String item = parent.getItemAtPosition(position).toString();
+            itemdept = parent.getItemAtPosition(position).toString();
         }
 
 
@@ -208,12 +228,50 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(getApplicationContext(), Home.class));
+                            final FirebaseUser user = mAuth.getCurrentUser();
+
+                            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference userNameRef = rootRef.child("Member").child(user.getUid());
+                            ValueEventListener eventListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.exists()) {
+                                        member.setName(user.getDisplayName());
+                                        member.setDepartment(itemdept);
+                                        member.setEmail(user.getEmail());
+                                        member.setSemester(itemsem);
+                                        sharedPref.saveString("userName", user.getDisplayName());
+                                        sharedPref.saveString("userEmail", user.getEmail());
+                                        sharedPref.saveString("userDept", itemdept);
+                                        sharedPref.saveString("userSem", itemsem);
+
+                                        reference.child(String.valueOf(user.getUid())).setValue(member);
+                                    }else{
+                                        String name_f = dataSnapshot.child("name").getValue().toString();
+                                        String sem_f = dataSnapshot.child("semester").getValue().toString();
+                                        String dept_f = dataSnapshot.child("department").getValue().toString();
+                                        String email_f = dataSnapshot.child("email").getValue().toString();
+
+                                        sharedPref.saveString("userName", name_f);
+                                        sharedPref.saveString("userEmail", email_f);
+                                        sharedPref.saveString("userDept", dept_f);
+                                        sharedPref.saveString("userSem", sem_f);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            };
+                            userNameRef.addListenerForSingleValueEvent(eventListener);
+
+
+                            startActivity(new Intent(getApplicationContext(), UpdateProfile.class));
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            toast("failed");
+//                            toast("failed");
 
                         }
 
@@ -226,11 +284,11 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
 //        if(mAuth.getCurrentUser() != null) {
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            if (currentUser != null) {
-                startActivity(new Intent(this, Home.class));
-            }
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            startActivity(new Intent(this, Home.class));
         }
+    }
 
 
     //------------------------------- End Google Sign in --------------------------------//
@@ -282,12 +340,12 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
         // add a button
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText otp1 = customLayout.findViewById(R.id.et_verificationCode);
-                        String otp2 = otp1.getText().toString();
-                        verifyCode(otp2);
-                    }
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText otp1 = customLayout.findViewById(R.id.et_verificationCode);
+                String otp2 = otp1.getText().toString();
+                verifyCode(otp2);
+            }
         });
 
         // create and show
@@ -309,7 +367,43 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(getApplicationContext(), Home.class);
+                            final FirebaseUser user = mAuth.getCurrentUser();
+
+                            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference userNameRef = rootRef.child("Member").child(user.getUid());
+                            ValueEventListener eventListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.exists()) {
+                                        member.setName("");
+                                        member.setDepartment(itemdept);
+                                        member.setEmail("");
+                                        member.setSemester(itemsem);
+                                        sharedPref.saveString("userSem", itemsem);
+                                        sharedPref.saveString("userDept", itemdept);
+
+                                        reference.child(String.valueOf(user.getUid())).setValue(member);
+                                    }else{
+                                        String name_f = dataSnapshot.child("name").getValue().toString();
+                                        String sem_f = dataSnapshot.child("semester").getValue().toString();
+                                        String dept_f = dataSnapshot.child("department").getValue().toString();
+                                        String email_f = dataSnapshot.child("email").getValue().toString();
+
+                                        sharedPref.saveString("userName", name_f);
+                                        sharedPref.saveString("userEmail", email_f);
+                                        sharedPref.saveString("userDept", dept_f);
+                                        sharedPref.saveString("userSem", sem_f);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            };
+                            userNameRef.addListenerForSingleValueEvent(eventListener);
+
+                            Intent intent = new Intent(getApplicationContext(), UpdateProfile.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         } else {
