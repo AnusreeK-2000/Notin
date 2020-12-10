@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,14 @@ public class UploadNotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload_display);
+
+        //Course Name
+        String name = getIntent().getExtras().get("subject").toString();
+
+        TextView courseName = (TextView) findViewById (R.id.textMyNotes);
+        courseName.setText(name);
+
+
         //back button
         ImageView imageBack = findViewById(R.id.home_back);
         imageBack.setOnClickListener(new View.OnClickListener() {

@@ -1,5 +1,7 @@
 package com.example.notin.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notin.R;
+import com.example.notin.Student.UploadNotesActivity;
 import com.example.notin.entities.RecentNotes;
 
 import java.util.ArrayList;
@@ -32,9 +35,20 @@ public class RecentNotesAdapter extends RecyclerView.Adapter<RecentNotesAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull RecentNotesHolder holder, int position) {
-        RecentNotes helperClass = recentNotesList.get(position);
+        final RecentNotes helperClass = recentNotesList.get(position);
 
         holder.textView.setText(helperClass.getName());
+
+        holder.textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context = view.getContext();
+                Intent intent = new Intent(context, UploadNotesActivity.class);
+                intent.putExtra("subject",helperClass.getSubject());
+                context.startActivity(intent);
+
+            }
+        });
     }
 
     @Override
