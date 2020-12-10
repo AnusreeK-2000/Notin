@@ -202,57 +202,70 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
 
     private void updateProfile() {
 
-        reference.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                name_f = snapshot.child("name").getValue().toString();
-                sem_f = snapshot.child("semester").getValue().toString();
-                dept_f = snapshot.child("department").getValue().toString();
-                email_f = snapshot.child("email").getValue().toString();
+//        reference.child(currentUser.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                name_f = snapshot.child("name").getValue().toString();
+//                sem_f = snapshot.child("semester").getValue().toString();
+//                dept_f = snapshot.child("department").getValue().toString();
+//                email_f = snapshot.child("email").getValue().toString();
 
-                if(currentUser.getDisplayName() != "") {
-                    if(name_f != ""){
-                        tv_username.setText(name_f);
-                        userr.setText(name_f);
-                        full_name_pro.setText(name_f);
-                        sharedPref.saveString("userName", name_f);
-                    }
-                    else{
-                        tv_username.setText(currentUser.getDisplayName());
-                        userr.setText(currentUser.getDisplayName());
-                        full_name_pro.setText(currentUser.getDisplayName());
-                        sharedPref.saveString("userName", currentUser.getDisplayName());
-                    }
+                String name_f = sharedPref.getString("userName");
+                String sem_f = sharedPref.getString("userSem");
+                String email_f = sharedPref.getString("userEmail");
+                String dept_f = sharedPref.getString("userDept");
 
-                }else{
-                    tv_username.setText("Hello User!");
-                    full_name_pro.setText("User");
-                }
+                tv_username.setText(name_f);
+                userr.setText(name_f);
+                full_name_pro.setText(name_f);
 
-                if(currentUser.getEmail() != "") {
-                    if (email_f != ""){
-                        email3.setText(email_f);
-                        emailedit.setText(email_f);
-                        sharedPref.saveString("userEmail", email_f);
-                    }else{
-                        email3.setText(currentUser.getEmail());
-                        emailedit.setText(currentUser.getEmail());
-                        sharedPref.saveString("userEmail", currentUser.getEmail());
-                    }
-
-                }else{
-                    email3.setText("");
-                    emailedit.setText("");
-                }
+                email3.setText(email_f);
+                emailedit.setText(email_f);
 
 
-            }
+//                if(currentUser.getDisplayName() != "") {
+//                    if(name_f != ""){
+//                        tv_username.setText(name_f);
+//                        userr.setText(name_f);
+//                        full_name_pro.setText(name_f);
+//                        sharedPref.saveString("userName", name_f);
+//                    }
+//                    else{
+//                        tv_username.setText(currentUser.getDisplayName());
+//                        userr.setText(currentUser.getDisplayName());
+//                        full_name_pro.setText(currentUser.getDisplayName());
+//                        sharedPref.saveString("userName", currentUser.getDisplayName());
+//                    }
+//
+//                }else{
+//                    tv_username.setText("Hello User!");
+//                    full_name_pro.setText("User");
+//                }
+//
+//                if(currentUser.getEmail() != "") {
+//                    if (email_f != ""){
+//                        email3.setText(email_f);
+//                        emailedit.setText(email_f);
+//                        sharedPref.saveString("userEmail", email_f);
+//                    }else{
+//                        email3.setText(currentUser.getEmail());
+//                        emailedit.setText(currentUser.getEmail());
+//                        sharedPref.saveString("userEmail", currentUser.getEmail());
+//                    }
+//
+//                }else{
+//                    email3.setText("");
+//                    emailedit.setText("");
+//                }
+//
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+//            }
 
-            }
-        });
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         if(currentUser.getPhotoUrl() != null){
             String imgurl = currentUser.getPhotoUrl().toString();
@@ -283,9 +296,9 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
                 tv_username.setText(name);
                 email3.setText(email);
                 TextView user = findViewById(R.id.full_name);
-                user.setText(name_f);
+                user.setText(name);
                 TextView emailedit = findViewById(R.id.email);
-                emailedit.setText(email_f);
+                emailedit.setText(email);
 
                 member.setName(name);
                 member.setDepartment(dept);
