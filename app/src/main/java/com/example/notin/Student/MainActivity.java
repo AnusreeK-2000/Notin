@@ -2,14 +2,18 @@ package com.example.notin.Student;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.SharedPreferences;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,11 +33,7 @@ import com.example.notin.listeners.NotesListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +150,29 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
         notesRecyclerView.setAdapter(notesAdapter);
 
 
-        getNotes(REQUEST_CODE_SHOW_ALL_NOTES);
+        getNotes(REQUEST_CODE_SHOW_ALL_NOTES,false);
+
+        //for search notes
+        EditText inputSearch=findViewById(R.id.searchField);
+        inputSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+notesAdapter.cancelTimer();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(noteList.size()!=0){
+                    notesAdapter.searchNotes(s.toString());
+                }
+
+            }
+        });
     }
 
     @Override
@@ -163,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
 
     }
 
-    private void getNotes(final int requestCode) {
+    private void getNotes(final int requestCode,final boolean isNoteDeleted ) {
         @SuppressLint("StaticFieldLeak")
         class GetNotesTask extends AsyncTask<Void, Void, List<Note>> {
             @Override
@@ -194,8 +216,13 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
                     notesRecyclerView.smoothScrollToPosition(0);
                 } else if (requestCode == REQUEST_CODE_UPDATE_NOTE) {
                     noteList.remove(noteClickedPosition);
-                    noteList.add(noteClickedPosition, notes.get(noteClickedPosition));
-                    notesAdapter.notifyItemChanged(noteClickedPosition);
+                    if(isNoteDeleted){
+                        notesAdapter.notifyItemRemoved(noteClickedPosition);
+                    }else{
+                        noteList.add(noteClickedPosition, notes.get(noteClickedPosition));
+                        notesAdapter.notifyItemChanged(noteClickedPosition);
+
+                    }
                 }
 
             }
@@ -208,10 +235,10 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK) {
-            getNotes(REQUEST_CODE_ADD_NOTE);
+            getNotes(REQUEST_CODE_ADD_NOTE,false);
         } else if (requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == RESULT_OK) {
             if (data != null) {
-                getNotes(REQUEST_CODE_UPDATE_NOTE);
+                getNotes(REQUEST_CODE_UPDATE_NOTE,data.getBooleanExtra("isNoteDeleted",false));
             }
 
         }

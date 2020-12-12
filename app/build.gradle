@@ -64,6 +64,7 @@ dependencies {
     implementation "com.firebaseui:firebase-ui-auth:3.0.0"
     implementation "com.firebaseui:firebase-ui-firestore:3.0.0"
     implementation 'com.google.firebase:firebase-storage:19.1.0'
+    implementation 'com.firebaseui:firebase-ui-database:6.4.0'
 
 
 //    //binding
