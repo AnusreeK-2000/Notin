@@ -3,7 +3,6 @@ package com.example.notin.Student;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -20,7 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notin.R;
 import com.example.notin.adapters.MyListAdapter;
-import com.example.notin.entities.myListData;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +33,8 @@ public class UploadNotesActivity extends AppCompatActivity {
     public static final int REQUEST_PERMISSION=1;
     public static ArrayList<File> mfiles=new ArrayList<>();
     File folder;
+    RecyclerView recyclerView;
+    RecyclerView.Adapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +68,7 @@ public class UploadNotesActivity extends AppCompatActivity {
         });
 
 
-
+/*
         myListData[] myListData=new myListData[]{
                 new myListData("Unix Unit 1 Notes", "Vikranth B.M"),
         new myListData("Computer Networks Unit 3 Notes", "Lohit J.J"),
@@ -80,18 +85,58 @@ public class UploadNotesActivity extends AppCompatActivity {
 
 
         };
+
+ */
         //permission method..
         permission();
 
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.uploadRecyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.uploadRecyclerView);
+        uploadNotesView(name);
+        /*
         MyListAdapter adapter = new MyListAdapter(this,myListData);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL,false));
         recyclerView.setAdapter(adapter);
+
+         */
     }
 
-   private void permission(){
+    private void uploadNotesView(String name) {
+        final ArrayList<UploadPDFDetails> notesHelper = new ArrayList<UploadPDFDetails>();
+
+        final Query nm= FirebaseDatabase.getInstance().getReference().child("Notes")
+                .orderByChild("subject")
+                .equalTo(name);
+
+        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
+                        UploadPDFDetails l=postSnapshot.getValue(UploadPDFDetails.class);
+                        notesHelper.add(l);
+                    }
+                    adapter = new MyListAdapter(UploadNotesActivity.this,notesHelper);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(UploadNotesActivity.this, LinearLayoutManager.VERTICAL, false));
+                    recyclerView.setAdapter(adapter);
+                    //System.out.println(notesHelper);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        recyclerView.setHasFixedSize(true);
+
+    }
+
+
+    private void permission(){
         if(ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
             if(ActivityCompat.shouldShowRequestPermissionRationale(com.example.notin.Student.UploadNotesActivity.this,

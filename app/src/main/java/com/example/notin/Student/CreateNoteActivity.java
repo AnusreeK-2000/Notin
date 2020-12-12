@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,8 +16,10 @@ import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,6 +28,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -39,7 +43,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import static android.view.MotionEvent.*;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MASK;
+import static android.view.MotionEvent.ACTION_UP;
 
 public class CreateNoteActivity extends AppCompatActivity {
 
@@ -47,7 +53,7 @@ public class CreateNoteActivity extends AppCompatActivity {
     private TextView textDateTime;
 
     private Note alreadyAvailableNote;
-
+     private AlertDialog dialogDelete;
     //Add camera btn
     ImageView camera;
 
@@ -120,6 +126,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         camera = findViewById(R.id.camera_btn);
         Button save = findViewById(R.id.Save_btn);
+        ImageView del=findViewById(R.id.del_btn);
 
 
         viewTitle = findViewById(R.id.NoteColorIndicator);
@@ -270,14 +277,71 @@ public class CreateNoteActivity extends AppCompatActivity {
             alreadyAvailableNote = (Note) getIntent().getSerializableExtra("note");
             setViewOrUpdateNote();
         }
+        if(alreadyAvailableNote!=null){
+            del.setVisibility(View.VISIBLE);
+            del.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDeleteDialog();
+
+                }
+            });
+        }
         initMiscellaneous();
         setTitleIndicatorColor();
     }
 
+private void showDeleteDialog(){
+        if(dialogDelete==null){
+            AlertDialog.Builder builder=new AlertDialog.Builder(CreateNoteActivity.this);
+            View view= LayoutInflater.from(this).inflate(
+                    R.layout.delete_note,
+                    (ViewGroup) findViewById(R.id.deleteNote)
+            );
+            builder.setView(view);
+            dialogDelete=builder.create() ;
+            if(dialogDelete.getWindow()!=null){
+                dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    @SuppressLint("StaticFieldLeak")
+                    class DeleteNoteTask extends AsyncTask<Void,Void,Void>{
 
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            NotesDatabase.getDatabase(getApplicationContext()).noteDao()
+                                    .deleteNote(alreadyAvailableNote);
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            super.onPostExecute(aVoid);
+                            Intent intent=new Intent();
+                            intent.putExtra("isNoteDeleted",true);
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
+                    }
+                    new DeleteNoteTask().execute();
+
+                }
+            });
+            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogDelete.dismiss();
+                }
+            });
+        }
+        dialogDelete.show();
+}
     private void setViewOrUpdateNote() {
         inputNoteTitle.setText(alreadyAvailableNote.getTitle());
         inputNoteText.setText(alreadyAvailableNote.getNoteText());
+
 
     }
 
