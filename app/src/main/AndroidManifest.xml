@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Student.UploadActivity"></activity>
+        <activity android:name=".Student.UploadActivity"/>
         <activity android:name=".Student.UpdateProfile" />
         <activity android:name=".Common.LoginActivity" />
         <activity android:name=".Student.MainActivity" />

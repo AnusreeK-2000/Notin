@@ -27,8 +27,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.notin.R;
+import com.example.notin.adapters.ImageAdapter;
 import com.example.notin.database.NotesDatabase;
 import com.example.notin.entities.Note;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -81,6 +83,22 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         checkPermission();
 
+
+        //for carousel of images
+        ViewPager viewPager=findViewById(R.id.viewpager);
+        ImageAdapter adapter2=new ImageAdapter(this);
+        viewPager.setAdapter(adapter2);
+
+        //back button
+        ImageView imageBack = findViewById(R.id.ImageBack);
+        imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //onBackPressed();
+                startActivity(new Intent(CreateNoteActivity.this,MainActivity.class));
+            }
+        });
+
         //--scroll desc
         EditText et = findViewById(R.id.description_text);
 
@@ -100,7 +118,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
         //back button
-        ImageView imageBack = findViewById(R.id.ImageBack);
+       // ImageView imageBack = findViewById(R.id.ImageBack);
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,7 +246,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
                 //displaying the first match
                 if (matches != null)
-                    inputNoteText.setText(matches.get(0));
+                    inputNoteText.setText(inputNoteText.getText()+"\n"+matches.get(0)+"\n");
             }
 
             @Override
@@ -255,7 +273,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
                     case ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
-                        inputNoteText.setText("");
+                        //inputNoteText.setText("");
                         inputNoteText.setHint("Listening...");
                         break;
                 }
