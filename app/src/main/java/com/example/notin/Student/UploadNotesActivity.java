@@ -36,7 +36,7 @@ public class UploadNotesActivity extends AppCompatActivity {
         setContentView(R.layout.upload_display);
 
         //Course Name
-        String name = getIntent().getExtras().get("subject").toString();
+        String name = getIntent().getExtras().get("name").toString();
 
         TextView courseName = (TextView) findViewById (R.id.textMyNotes);
         courseName.setText(name);

@@ -33,6 +33,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CoursesAdapter.CourseClickListener{
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private FirebaseAuth mAuth;
     Boolean firstTime;
@@ -142,6 +143,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     private void coursesRecycler(){
         final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
+        String dept = sharedPref.getString("userDept");
 //        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
 //        coursesHelperClasses.add(new Courses("Computer Networks"));
 //        coursesHelperClasses.add(new Courses("UNIX Shell Programming"));
@@ -150,7 +152,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 //        coursesHelperClasses.add(new Courses("Software Engineering"));
 //        coursesHelperClasses.add(new Courses("Software Project Management and Finance"));
 
-        final DatabaseReference nm= FirebaseDatabase.getInstance().getReference().child("Courses");
+        final Query nm= FirebaseDatabase.getInstance().getReference().child("Courses").orderByChild("department").equalTo(dept);
         nm.addListenerForSingleValueEvent(new ValueEventListener() {
                                               @Override
                                               public void onDataChange(DataSnapshot dataSnapshot) {
@@ -161,7 +163,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                                       }
 //                                                      adapter=new MyAdapter(listData);
 //                                                      rv.setAdapter(adapter);
-                                                      adapter = new CoursesAdapter(coursesHelperClasses, Home.this);
+                                                      adapter = new CoursesAdapter(coursesHelperClasses);
                                                       coursesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.VERTICAL, false));
                                                       coursesRecycler.setAdapter(adapter);
                                                       System.out.println(coursesHelperClasses);
@@ -274,11 +276,5 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-    @Override
-    public void onCourseClick(int position) {
-        Intent intent = new Intent(this, UploadNotesActivity.class);
-        startActivity(intent);
 
-
-    }
 }
