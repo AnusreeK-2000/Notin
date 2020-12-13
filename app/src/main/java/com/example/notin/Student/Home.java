@@ -97,7 +97,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void recentNotesRecycler(){
-        final ArrayList<RecentNotes> recentNotesHelperClasses = new ArrayList<>();
+        final ArrayList<UploadPDFDetails> recentNotesHelperClasses = new ArrayList<>();
 //        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
 //        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
 //        recentNotesHelperClasses.add(new RecentNotes("Process"));
@@ -115,7 +115,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     for (DataSnapshot npsnapshot : dataSnapshot.getChildren()){
-                        RecentNotes l=npsnapshot.getValue(RecentNotes.class);
+                        UploadPDFDetails l=npsnapshot.getValue(UploadPDFDetails.class);
                         recentNotesHelperClasses.add(l);
                     }
 //                                                      adapter=new MyAdapter(listData);

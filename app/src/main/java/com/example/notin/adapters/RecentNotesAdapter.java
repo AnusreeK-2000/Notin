@@ -12,14 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notin.R;
 import com.example.notin.Student.UploadNotesActivity;
+import com.example.notin.Student.UploadPDFDetails;
+import com.example.notin.Student.pdfViewerActivity;
 import com.example.notin.entities.RecentNotes;
 
 import java.util.ArrayList;
 
 public class RecentNotesAdapter extends RecyclerView.Adapter<RecentNotesAdapter.RecentNotesHolder>  {
-    ArrayList<RecentNotes> recentNotesList;
+    ArrayList<UploadPDFDetails> recentNotesList;
 
-    public RecentNotesAdapter(ArrayList<RecentNotes> recentNotesList) {
+    public RecentNotesAdapter(ArrayList<UploadPDFDetails> recentNotesList) {
         this.recentNotesList = recentNotesList;
     }
 
@@ -34,8 +36,8 @@ public class RecentNotesAdapter extends RecyclerView.Adapter<RecentNotesAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecentNotesHolder holder, int position) {
-        final RecentNotes helperClass = recentNotesList.get(position);
+    public void onBindViewHolder(@NonNull RecentNotesHolder holder, final int position) {
+        final UploadPDFDetails helperClass = recentNotesList.get(position);
 
         holder.textView.setText(helperClass.getName());
 
@@ -43,8 +45,12 @@ public class RecentNotesAdapter extends RecyclerView.Adapter<RecentNotesAdapter.
             @Override
             public void onClick(View view) {
                 Context context = view.getContext();
-                Intent intent = new Intent(context, UploadNotesActivity.class);
-                intent.putExtra("subject",helperClass.getSubject());
+                Intent intent=new Intent(context, pdfViewerActivity.class);
+
+                //sending position of the listdata to retrieve the path and open new activity
+                //intent.putExtra("position",position);
+                intent.putExtra("title",recentNotesList.get(position).getName());
+                intent.putExtra("link",recentNotesList.get(position).getUrl());
                 context.startActivity(intent);
 
             }
