@@ -1,53 +1,54 @@
-package com.example.notin.Student;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.Settings;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
+        package com.example.notin.Student;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
+        import android.Manifest;
+        import android.annotation.SuppressLint;
+        import android.app.Activity;
+        import android.content.Intent;
+        import android.content.pm.PackageManager;
+        import android.graphics.Bitmap;
+        import android.graphics.BitmapFactory;
+        import android.graphics.Color;
+        import android.graphics.drawable.GradientDrawable;
+        import android.net.Uri;
+        import android.os.AsyncTask;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.os.Environment;
+        import android.provider.MediaStore;
+        import android.provider.Settings;
+        import android.speech.RecognitionListener;
+        import android.speech.RecognizerIntent;
+        import android.speech.SpeechRecognizer;
+        import android.util.Log;
+        import android.view.MotionEvent;
+        import android.view.View;
+        import android.widget.Button;
+        import android.widget.EditText;
+        import android.widget.ImageView;
+        import android.widget.LinearLayout;
+        import android.widget.SeekBar;
+        import android.widget.TextView;
+        import android.widget.Toast;
 
-import com.example.notin.R;
-import com.example.notin.adapters.ImageAdapter;
-import com.example.notin.database.NotesDatabase;
-import com.example.notin.entities.Note;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+        import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.content.ContextCompat;
+        import androidx.core.content.FileProvider;
 
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+        import com.example.notin.BuildConfig;
+        import com.example.notin.R;
+        import com.example.notin.database.NotesDatabase;
+        import com.example.notin.entities.Note;
+        import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_MASK;
-import static android.view.MotionEvent.ACTION_UP;
+        import java.io.File;
+        import java.io.IOException;
+        import java.text.SimpleDateFormat;
+        import java.util.ArrayList;
+        import java.util.Date;
+        import java.util.Locale;
+
+        import static android.view.MotionEvent.*;
 
 public class CreateNoteActivity extends AppCompatActivity {
 
@@ -55,17 +56,21 @@ public class CreateNoteActivity extends AppCompatActivity {
     private TextView textDateTime;
 
     private Note alreadyAvailableNote;
-     private AlertDialog dialogDelete;
+
     //Add camera btn
     ImageView camera;
 
+    //Seek bar for text size
     SeekBar seekBar;
     TextView txtSeekBar;
     int textSize = 1;
     int saveProgress;
 
     //For camera
-    OutputStream outputStream;
+    static final int REQUEST_IMAGE_CAPTURE=100;
+    static final int IMAGE_DISPLAY=22;
+
+    int i=1;
     private View viewTitle;
     private String selectedColor;
 
@@ -91,9 +96,9 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
         //for carousel of images
-        ViewPager viewPager=findViewById(R.id.viewpager);
-        ImageAdapter adapter2=new ImageAdapter(this);
-        viewPager.setAdapter(adapter2);
+        // ViewPager viewPager=findViewById(R.id.viewpager);
+        //  ImageAdapter adapter2=new ImageAdapter(this);
+        //  viewPager.setAdapter(adapter2);
 
         //back button
         ImageView imageBack = findViewById(R.id.ImageBack);
@@ -124,7 +129,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
         //back button
-       // ImageView imageBack = findViewById(R.id.ImageBack);
+        // ImageView imageBack = findViewById(R.id.ImageBack);
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,7 +149,6 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         camera = findViewById(R.id.camera_btn);
         Button save = findViewById(R.id.Save_btn);
-        ImageView del=findViewById(R.id.del_btn);
 
 
         viewTitle = findViewById(R.id.NoteColorIndicator);
@@ -172,19 +176,16 @@ public class CreateNoteActivity extends AppCompatActivity {
         });
 
 
-        //INITIAL BUTTON FUNCTION
+        //Camera BUTTON FUNCTION
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    Intent click=new Intent();
-                    click.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivity(click);
-                }
-                catch (Exception e)
-                {
+                    dispatchTakePictureIntent();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
             }
         });
 
@@ -295,72 +296,26 @@ public class CreateNoteActivity extends AppCompatActivity {
             alreadyAvailableNote = (Note) getIntent().getSerializableExtra("note");
             setViewOrUpdateNote();
         }
-        if(alreadyAvailableNote!=null){
-            del.setVisibility(View.VISIBLE);
-            del.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showDeleteDialog();
-
-                }
-            });
-        }
         initMiscellaneous();
         setTitleIndicatorColor();
     }
 
-private void showDeleteDialog(){
-        if(dialogDelete==null){
-            AlertDialog.Builder builder=new AlertDialog.Builder(CreateNoteActivity.this);
-            View view= LayoutInflater.from(this).inflate(
-                    R.layout.delete_note,
-                    (ViewGroup) findViewById(R.id.deleteNote)
-            );
-            builder.setView(view);
-            dialogDelete=builder.create() ;
-            if(dialogDelete.getWindow()!=null){
-                dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            }
-            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    @SuppressLint("StaticFieldLeak")
-                    class DeleteNoteTask extends AsyncTask<Void,Void,Void>{
 
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            NotesDatabase.getDatabase(getApplicationContext()).noteDao()
-                                    .deleteNote(alreadyAvailableNote);
-                            return null;
-                        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            super.onPostExecute(aVoid);
-                            Intent intent=new Intent();
-                            intent.putExtra("isNoteDeleted",true);
-                            setResult(RESULT_OK,intent);
-                            finish();
-                        }
-                    }
-                    new DeleteNoteTask().execute();
 
-                }
-            });
-            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialogDelete.dismiss();
-                }
-            });
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
+            displayImage();
         }
-        dialogDelete.show();
-}
+    }
+
     private void setViewOrUpdateNote() {
         inputNoteTitle.setText(alreadyAvailableNote.getTitle());
         inputNoteText.setText(alreadyAvailableNote.getNoteText());
-
-
+        displayImage();
     }
 
     private void saveNote() {
@@ -378,6 +333,7 @@ private void showDeleteDialog(){
         note.setNoteText(inputNoteText.getText().toString());
         note.setDateTime(textDateTime.getText().toString());
         note.setColor(selectedColor);
+
 
         //getting id of new note from already available note,as OnConflictStrategy is set to "replace" in noteDao,hence it will be updated
         if (alreadyAvailableNote != null) {
@@ -497,5 +453,112 @@ private void showDeleteDialog(){
         gradientDrawable.setColor((Color.parseColor(selectedColor)));
     }
 
+    //To display saved photos
+    protected void displayImage(){
+
+
+        String ExternalStorageDirectoryPath = Environment
+               .getExternalStorageDirectory()
+                .getAbsolutePath();
+
+       // String targetPath = ExternalStorageDirectoryPath + "/DCIM/App";
+        String targetPath = ExternalStorageDirectoryPath + "/DCIM/Notin/"+inputNoteTitle.getText().toString();
+        ArrayList<String> images = new ArrayList<String>();
+        File targetDirector = new File(targetPath);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.imageLayout);
+        layout.removeAllViews();
+        File[] files = targetDirector.listFiles();
+
+
+        for (File file : files) {
+
+            String filepath = file.getAbsolutePath();
+            Bitmap bmp = BitmapFactory.decodeFile(filepath);
+
+            ImageView image = new ImageView(this);
+            image.setLayoutParams(new android.view.ViewGroup.LayoutParams(1000, 1000));
+            image.setMaxHeight(500);
+            image.setMaxWidth(500);
+            // Adds the view to the layout
+            layout.addView(image);
+
+            image.setImageBitmap(bmp);
+        }
+    }
+
+    //Set up the camera intent
+    private void dispatchTakePictureIntent() throws InterruptedException {
+        if (inputNoteTitle.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Enter a Title pls!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+      //  startActivityForResult(takePictureIntent, IMAGE_DISPLAY);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Toast.makeText(this,"THis is not working!",
+                        Toast.LENGTH_SHORT).show();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        BuildConfig.APPLICATION_ID +".provider",
+                        photoFile);
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+
+            }
+
+        }
+    }
+
+
+
+    //Create Image File
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir= new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM),"Notin/"+inputNoteTitle.getText().toString());
+        if(!storageDir.exists()){
+
+            boolean s = new File(storageDir.getPath()).mkdirs();
+
+            if(!s){
+                Toast.makeText(this,"NOt created!",
+                        Toast.LENGTH_SHORT).show();
+                Log.v("not", "not created");
+            }
+            else{
+                Log.v("cr","directory created");
+            }
+        }
+        else{
+            Log.v("directory", "directory exists");
+        }
+
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".png",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        String currentPhotoPath = image.getAbsolutePath();
+        Uri uriOfImage = Uri.parse(image.getPath());
+        return image;
+
+    }
 }
 
