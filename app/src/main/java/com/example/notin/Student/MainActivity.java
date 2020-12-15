@@ -273,6 +273,11 @@ notesAdapter.cancelTimer();
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home);
 
+        String teacher = sharedPref.getString("teacher");
+        if(teacher.equals("1")){
+            navigationView.getMenu().setGroupVisible(R.id.pri, false);
+        }
+
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

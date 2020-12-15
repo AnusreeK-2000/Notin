@@ -20,7 +20,7 @@
 
     </group>
     <item android:title="Private">
-        <group android:checkableBehavior="single">
+        <group android:checkableBehavior="single" android:id="@+id/pri">
             <menu>
                 <item
                     android:id="@+id/your_notes"

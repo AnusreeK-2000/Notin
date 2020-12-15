@@ -61,13 +61,21 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     SharedPrefUtil sharedPref;
     String itemsem;
     String itemdept;
+    String teacher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        reference = FirebaseDatabase.getInstance().getReference().child("Member");
+        sharedPref = new SharedPrefUtil(LoginActivity.this);
+        teacher = sharedPref.getString("teacher");
+        if (teacher.equals("1")) {
+            reference = FirebaseDatabase.getInstance().getReference().child("Faculty");
+        } else {
+            reference = FirebaseDatabase.getInstance().getReference().child("Member");
+        }
+
         member = new Member();
         //--for mobile sign in
         findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
@@ -92,7 +100,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
-        sharedPref = new SharedPrefUtil(LoginActivity.this);
 
         //--for google sign in
         mAuth = FirebaseAuth.getInstance();
@@ -107,6 +114,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         // Spinner element
         spinnerSem = (Spinner) findViewById(R.id.spinnerSem);
         spinnerDept = (Spinner) findViewById(R.id.spinnerDept);
+
+        if (teacher.equals("1")) {
+            spinnerSem.setVisibility(View.GONE);
+            findViewById(R.id.spinnerLayout).setVisibility(View.GONE);
+        } else {
+            spinnerSem.setVisibility(View.VISIBLE);
+        }
 
         // Spinner click listener
         spinnerSem.setOnItemSelectedListener(this);
@@ -220,6 +234,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         }
     }
 
+
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
@@ -231,32 +246,45 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                             final FirebaseUser user = mAuth.getCurrentUser();
 
                             DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-                            DatabaseReference userNameRef = rootRef.child("Member").child(user.getUid());
+                            DatabaseReference userNameRef;
+                            if(teacher.equals("1")){
+                                userNameRef = rootRef.child("Faculty").child(user.getUid());
+                            }else{
+                                userNameRef = rootRef.child("Member").child(user.getUid());
+                            }
                             ValueEventListener eventListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if(!dataSnapshot.exists()) {
+                                    if (!dataSnapshot.exists()) {
                                         member.setName(user.getDisplayName());
                                         member.setDepartment(itemdept);
                                         member.setEmail(user.getEmail());
-                                        member.setSemester(itemsem);
+
                                         sharedPref.saveString("userName", user.getDisplayName());
                                         sharedPref.saveString("userEmail", user.getEmail());
                                         sharedPref.saveString("userDept", itemdept);
-                                        sharedPref.saveString("userSem", itemsem);
+
+                                        if (!teacher.equals("1")) {
+                                            member.setSemester(itemsem);
+                                            sharedPref.saveString("userSem", itemsem);
+                                        }
+
 
                                         reference.child(String.valueOf(user.getUid())).setValue(member);
                                         startActivity(new Intent(getApplicationContext(), UpdateProfile.class));
-                                    }else{
+                                    } else {
                                         String name_f = dataSnapshot.child("name").getValue().toString();
-                                        String sem_f = dataSnapshot.child("semester").getValue().toString();
+                                        if (!teacher.equals("1")){
+                                            String sem_f = dataSnapshot.child("semester").getValue().toString();
+                                            sharedPref.saveString("userSem", sem_f);
+                                        }
                                         String dept_f = dataSnapshot.child("department").getValue().toString();
                                         String email_f = dataSnapshot.child("email").getValue().toString();
 
                                         sharedPref.saveString("userName", name_f);
                                         sharedPref.saveString("userEmail", email_f);
                                         sharedPref.saveString("userDept", dept_f);
-                                        sharedPref.saveString("userSem", sem_f);
+
 
                                         startActivity(new Intent(getApplicationContext(), Home.class));
                                     }
@@ -269,8 +297,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                                 }
                             };
                             userNameRef.addListenerForSingleValueEvent(eventListener);
-
-
 
 
                         } else {
@@ -374,32 +400,45 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                             final FirebaseUser user = mAuth.getCurrentUser();
 
                             DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-                            DatabaseReference userNameRef = rootRef.child("Member").child(user.getUid());
+                            DatabaseReference userNameRef;
+                            if(teacher.equals("1")){
+                                userNameRef = rootRef.child("Faculty").child(user.getUid());
+                            }else{
+                                userNameRef = rootRef.child("Member").child(user.getUid());
+                            }
                             ValueEventListener eventListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if(!dataSnapshot.exists()) {
+                                    if (!dataSnapshot.exists()) {
                                         member.setName("");
                                         member.setDepartment(itemdept);
                                         member.setEmail("");
-                                        member.setSemester(itemsem);
-                                        sharedPref.saveString("userSem", itemsem);
+                                        if (!teacher.equals("1")) {
+                                            member.setSemester(itemsem);
+                                            sharedPref.saveString("userSem", itemsem);
+                                        }
+
                                         sharedPref.saveString("userDept", itemdept);
 
                                         reference.child(String.valueOf(user.getUid())).setValue(member);
                                         Intent intent = new Intent(getApplicationContext(), UpdateProfile.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
-                                    }else{
+                                    } else {
                                         String name_f = dataSnapshot.child("name").getValue().toString();
-                                        String sem_f = dataSnapshot.child("semester").getValue().toString();
                                         String dept_f = dataSnapshot.child("department").getValue().toString();
                                         String email_f = dataSnapshot.child("email").getValue().toString();
 
                                         sharedPref.saveString("userName", name_f);
                                         sharedPref.saveString("userEmail", email_f);
                                         sharedPref.saveString("userDept", dept_f);
-                                        sharedPref.saveString("userSem", sem_f);
+
+
+                                        if (!teacher.equals("1")) {
+                                            String sem_f = dataSnapshot.child("semester").getValue().toString();
+                                            sharedPref.saveString("userSem", sem_f);
+                                        }
+
                                         Intent intent = new Intent(getApplicationContext(), Home.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
