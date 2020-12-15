@@ -208,8 +208,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 Glide.with(this).load(imgurl).into(iv_userphoto);
             }
         }
-
-
+        String teacher = sharedPref.getString("teacher");
+        if(teacher.equals("1")){
+            navigationView.getMenu().setGroupVisible(R.id.pri, false);
+        }
 
         //Navigation Drawer
         navigationView.bringToFront();

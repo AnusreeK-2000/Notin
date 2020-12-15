@@ -57,6 +57,7 @@
                     android:textColorHint="#7B848E" />
 
                 <LinearLayout
+                    android:id="@+id/spinnerLayout"
                     android:layout_marginTop="13dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

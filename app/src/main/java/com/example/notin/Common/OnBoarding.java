@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.notin.Student.Home;
+import com.example.notin.Student.UploadActivity;
+import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.SliderAdapter;
 import com.example.notin.R;
 
@@ -17,6 +19,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class OnBoarding extends AppCompatActivity {
 
@@ -28,6 +31,7 @@ public class OnBoarding extends AppCompatActivity {
     Button letsGetStarted;
     Animation animation;
     int currentPos;
+    SharedPrefUtil sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,7 @@ public class OnBoarding extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_on_boarding);
 
+        sharedPref = new SharedPrefUtil(OnBoarding.this);
         //Hooks
         viewPager = findViewById(R.id.slider);
         dotsLayout = findViewById(R.id.dots);
@@ -81,7 +86,7 @@ public class OnBoarding extends AppCompatActivity {
     ViewPager.OnPageChangeListener changeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+//            Toast.makeText(OnBoarding.this, "hi" + position, Toast.LENGTH_SHORT ).show();
         }
 
         @Override
@@ -89,6 +94,7 @@ public class OnBoarding extends AppCompatActivity {
             addDots(position);
             currentPos = position;
 
+//            Toast.makeText(OnBoarding.this, "hi" + position, Toast.LENGTH_SHORT ).show();
 //            if (position == 0) {
 //                letsGetStarted.setVisibility(View.INVISIBLE);
 //            } else if (position == 1) {
@@ -98,6 +104,7 @@ public class OnBoarding extends AppCompatActivity {
 //            } else {
 //                animation = AnimationUtils.loadAnimation(OnBoarding.this, R.anim.bottom_anim);
 //                letsGetStarted.setAnimation(animation);
+                sharedPref.saveString("teacher", String.valueOf(position));
                 letsGetStarted.setVisibility(View.VISIBLE);
 //            }
 
