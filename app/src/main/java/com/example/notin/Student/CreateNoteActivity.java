@@ -2,53 +2,59 @@
         package com.example.notin.Student;
 
         import android.Manifest;
-        import android.annotation.SuppressLint;
+import android.annotation.SuppressLint;
         import android.app.Activity;
         import android.content.Intent;
-        import android.content.pm.PackageManager;
-        import android.graphics.Bitmap;
-        import android.graphics.BitmapFactory;
-        import android.graphics.Color;
-        import android.graphics.drawable.GradientDrawable;
-        import android.net.Uri;
-        import android.os.AsyncTask;
-        import android.os.Build;
-        import android.os.Bundle;
-        import android.os.Environment;
-        import android.provider.MediaStore;
-        import android.provider.Settings;
-        import android.speech.RecognitionListener;
-        import android.speech.RecognizerIntent;
-        import android.speech.SpeechRecognizer;
-        import android.util.Log;
-        import android.view.MotionEvent;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.ImageView;
-        import android.widget.LinearLayout;
-        import android.widget.SeekBar;
-        import android.widget.TextView;
-        import android.widget.Toast;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-        import androidx.appcompat.app.AppCompatActivity;
-        import androidx.core.content.ContextCompat;
-        import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-        import com.example.notin.BuildConfig;
-        import com.example.notin.R;
-        import com.example.notin.database.NotesDatabase;
-        import com.example.notin.entities.Note;
-        import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.example.notin.BuildConfig;
+import com.example.notin.R;
+import com.example.notin.database.NotesDatabase;
+import com.example.notin.entities.Note;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-        import java.io.File;
-        import java.io.IOException;
-        import java.text.SimpleDateFormat;
-        import java.util.ArrayList;
-        import java.util.Date;
-        import java.util.Locale;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
-        import static android.view.MotionEvent.*;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MASK;
+import static android.view.MotionEvent.ACTION_UP;
 
 public class CreateNoteActivity extends AppCompatActivity {
 
@@ -56,6 +62,7 @@ public class CreateNoteActivity extends AppCompatActivity {
     private TextView textDateTime;
 
     private Note alreadyAvailableNote;
+    private AlertDialog dialogDelete;
 
     //Add camera btn
     ImageView camera;
@@ -87,6 +94,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,15 +108,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         //  ImageAdapter adapter2=new ImageAdapter(this);
         //  viewPager.setAdapter(adapter2);
 
-        //back button
-        ImageView imageBack = findViewById(R.id.ImageBack);
-        imageBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //onBackPressed();
-                startActivity(new Intent(CreateNoteActivity.this,MainActivity.class));
-            }
-        });
+
 
         //--scroll desc
         EditText et = findViewById(R.id.description_text);
@@ -128,8 +128,8 @@ public class CreateNoteActivity extends AppCompatActivity {
         });
 
 
-        //back button
-        // ImageView imageBack = findViewById(R.id.ImageBack);
+//back button
+        ImageView imageBack = findViewById(R.id.ImageBack);
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +149,8 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         camera = findViewById(R.id.camera_btn);
         Button save = findViewById(R.id.Save_btn);
+        ImageView del=findViewById(R.id.del_btn);
+
 
 
         viewTitle = findViewById(R.id.NoteColorIndicator);
@@ -290,16 +292,75 @@ public class CreateNoteActivity extends AppCompatActivity {
         });
 
 
-        selectedColor = "#808080";
+
 
         if (getIntent().getBooleanExtra("isViewOrUpdate", false)) {
             alreadyAvailableNote = (Note) getIntent().getSerializableExtra("note");
             setViewOrUpdateNote();
         }
+        if(alreadyAvailableNote!=null){
+            del.setVisibility(View.VISIBLE);
+            del.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDeleteDialog();
+
+                }
+            });
+
+        }
+        selectedColor = "#808080";
         initMiscellaneous();
         setTitleIndicatorColor();
     }
 
+    private void showDeleteDialog(){
+        if(dialogDelete==null){
+            AlertDialog.Builder builder=new AlertDialog.Builder(CreateNoteActivity.this);
+            View view= LayoutInflater.from(this).inflate(
+                    R.layout.delete_note,
+                    (ViewGroup) findViewById(R.id.deleteNote)
+            );
+            builder.setView(view);
+            dialogDelete=builder.create() ;
+            if(dialogDelete.getWindow()!=null){
+                dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            }
+            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    @SuppressLint("StaticFieldLeak")
+                    class DeleteNoteTask extends AsyncTask<Void, Void, Void> {
+
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            NotesDatabase.getDatabase(getApplicationContext()).noteDao()
+                                    .deleteNote(alreadyAvailableNote);
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            super.onPostExecute(aVoid);
+                            Intent intent = new Intent();
+                            intent.putExtra("isNoteDeleted", true);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+                    }
+                    new DeleteNoteTask().execute();
+
+                }
+            });
+            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialogDelete.dismiss();
+                }
+            });
+        }
+        dialogDelete.show();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -316,7 +377,10 @@ public class CreateNoteActivity extends AppCompatActivity {
         inputNoteTitle.setText(alreadyAvailableNote.getTitle());
         inputNoteText.setText(alreadyAvailableNote.getNoteText());
         displayImage();
+
     }
+
+
 
     private void saveNote() {
         //validations
@@ -397,7 +461,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutMisc.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#3a52fc";
+                selectedColor = "#ff69b4";
                 imageColor2.setImageResource(R.drawable.ic_done);
                 imageColor1.setImageResource(0);
                 imageColor3.setImageResource(0);
@@ -433,7 +497,7 @@ public class CreateNoteActivity extends AppCompatActivity {
                 case "#808080":
                     layoutMisc.findViewById(R.id.viewColor1).performClick();
                     break;
-                case "#3a52fc":
+                case "#ff69b4":
                     layoutMisc.findViewById(R.id.viewColor2).performClick();
                     break;
                 case "#fd8e38":
@@ -560,5 +624,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         return image;
 
     }
+
+
 }
 
