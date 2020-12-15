@@ -2,59 +2,56 @@
         package com.example.notin.Student;
 
         import android.Manifest;
-import android.annotation.SuppressLint;
+        import android.annotation.SuppressLint;
         import android.app.Activity;
         import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.provider.Settings;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
+        import android.content.pm.PackageManager;
+        import android.graphics.Bitmap;
+        import android.graphics.BitmapFactory;
+        import android.graphics.Color;
+        import android.graphics.drawable.GradientDrawable;
+        import android.net.Uri;
+        import android.os.AsyncTask;
+        import android.os.Build;
+        import android.os.Bundle;
+        import android.os.Environment;
+        import android.provider.MediaStore;
+        import android.provider.Settings;
+        import android.speech.RecognitionListener;
+        import android.speech.RecognizerIntent;
+        import android.speech.SpeechRecognizer;
+        import android.util.Log;
+        import android.view.MotionEvent;
+        import android.view.View;
+        import android.widget.Button;
+        import android.widget.EditText;
+        import android.widget.ImageView;
+        import android.widget.LinearLayout;
+        import android.widget.SeekBar;
+        import android.widget.TextView;
+        import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
+        import androidx.annotation.NonNull;
+        import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.app.ActivityCompat;
+        import androidx.core.content.ContextCompat;
+        import androidx.core.content.FileProvider;
 
-import com.example.notin.BuildConfig;
-import com.example.notin.R;
-import com.example.notin.database.NotesDatabase;
-import com.example.notin.entities.Note;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+        import com.example.notin.BuildConfig;
+        import com.example.notin.R;
+        import com.example.notin.database.NotesDatabase;
+        import com.example.notin.entities.Note;
+        import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+        import java.io.File;
+        import java.io.IOException;
+        import java.text.SimpleDateFormat;
+        import java.util.ArrayList;
+        import java.util.Date;
+        import java.util.List;
+        import java.util.Locale;
 
-import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_MASK;
-import static android.view.MotionEvent.ACTION_UP;
+        import static android.view.MotionEvent.*;
 
 public class CreateNoteActivity extends AppCompatActivity {
 
@@ -62,7 +59,6 @@ public class CreateNoteActivity extends AppCompatActivity {
     private TextView textDateTime;
 
     private Note alreadyAvailableNote;
-    private AlertDialog dialogDelete;
 
     //Add camera btn
     ImageView camera;
@@ -75,7 +71,10 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     //For camera
     static final int REQUEST_IMAGE_CAPTURE=100;
-    static final int IMAGE_DISPLAY=22;
+    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 101;
+
+    //For microphone
+    final private int MICROPHONE_PERMISSIONS = 102;
 
     int i=1;
     private View viewTitle;
@@ -84,17 +83,60 @@ public class CreateNoteActivity extends AppCompatActivity {
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
-                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-                finish();
+
+                ActivityCompat.requestPermissions(CreateNoteActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, MICROPHONE_PERMISSIONS);
             }
+
+
         }
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+       /* if(requestCode==CAMERA_PERMISSION && grantResults[0]==PackageManager.PERMISSION_GRANTED){
 
-    @SuppressLint("ClickableViewAccessibility")
+                try {
+                    dispatchTakePictureIntent();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                Toast.makeText(CreateNoteActivity.this,"Camera Permission not provided",Toast.LENGTH_SHORT).show();
+            }*/
+
+        switch (requestCode) {
+
+                //If neither permission given
+            case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+                if (grantResults.length > 0) {
+                    boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeExternalfile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if(cameraPermission && writeExternalfile)
+                    {
+                        try {
+                            dispatchTakePictureIntent();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(CreateNoteActivity.this,"Camera and storage Permission not provided",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+
+            case MICROPHONE_PERMISSIONS:
+                if(requestCode==MICROPHONE_PERMISSIONS && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+
+                }
+                else{
+                    Toast.makeText(CreateNoteActivity.this,"Microphone Permission not provided",Toast.LENGTH_SHORT).show();
+                }
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +150,15 @@ public class CreateNoteActivity extends AppCompatActivity {
         //  ImageAdapter adapter2=new ImageAdapter(this);
         //  viewPager.setAdapter(adapter2);
 
-
+        //back button
+        ImageView imageBack = findViewById(R.id.ImageBack);
+        imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //onBackPressed();
+                startActivity(new Intent(CreateNoteActivity.this,MainActivity.class));
+            }
+        });
 
         //--scroll desc
         EditText et = findViewById(R.id.description_text);
@@ -128,8 +178,8 @@ public class CreateNoteActivity extends AppCompatActivity {
         });
 
 
-//back button
-        ImageView imageBack = findViewById(R.id.ImageBack);
+        //back button
+        // ImageView imageBack = findViewById(R.id.ImageBack);
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,8 +199,6 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         camera = findViewById(R.id.camera_btn);
         Button save = findViewById(R.id.Save_btn);
-        ImageView del=findViewById(R.id.del_btn);
-
 
 
         viewTitle = findViewById(R.id.NoteColorIndicator);
@@ -180,13 +228,30 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         //Camera BUTTON FUNCTION
         camera.setOnClickListener(new View.OnClickListener() {
+            List<String> permissionsNeeded = new ArrayList<String>();
+
+            final List<String> permissionsList = new ArrayList<String>();
             @Override
             public void onClick(View v) {
-                try {
-                    dispatchTakePictureIntent();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                //Both camera and storage not provided
+                if (ContextCompat.checkSelfPermission(CreateNoteActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) + ContextCompat
+                        .checkSelfPermission(CreateNoteActivity.this,
+                                Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        dispatchTakePictureIntent();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+
+
+                else{
+                    ActivityCompat.requestPermissions(CreateNoteActivity.this,new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                }
+
 
             }
         });
@@ -273,6 +338,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
         findViewById(R.id.audio_btn).setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -292,75 +358,16 @@ public class CreateNoteActivity extends AppCompatActivity {
         });
 
 
-
+        selectedColor = "#808080";
 
         if (getIntent().getBooleanExtra("isViewOrUpdate", false)) {
             alreadyAvailableNote = (Note) getIntent().getSerializableExtra("note");
             setViewOrUpdateNote();
         }
-        if(alreadyAvailableNote!=null){
-            del.setVisibility(View.VISIBLE);
-            del.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showDeleteDialog();
-
-                }
-            });
-
-        }
-        selectedColor = "#808080";
         initMiscellaneous();
         setTitleIndicatorColor();
     }
 
-    private void showDeleteDialog(){
-        if(dialogDelete==null){
-            AlertDialog.Builder builder=new AlertDialog.Builder(CreateNoteActivity.this);
-            View view= LayoutInflater.from(this).inflate(
-                    R.layout.delete_note,
-                    (ViewGroup) findViewById(R.id.deleteNote)
-            );
-            builder.setView(view);
-            dialogDelete=builder.create() ;
-            if(dialogDelete.getWindow()!=null){
-                dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            }
-            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    @SuppressLint("StaticFieldLeak")
-                    class DeleteNoteTask extends AsyncTask<Void, Void, Void> {
-
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            NotesDatabase.getDatabase(getApplicationContext()).noteDao()
-                                    .deleteNote(alreadyAvailableNote);
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Void aVoid) {
-                            super.onPostExecute(aVoid);
-                            Intent intent = new Intent();
-                            intent.putExtra("isNoteDeleted", true);
-                            setResult(RESULT_OK, intent);
-                            finish();
-                        }
-                    }
-                    new DeleteNoteTask().execute();
-
-                }
-            });
-            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialogDelete.dismiss();
-                }
-            });
-        }
-        dialogDelete.show();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -377,10 +384,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         inputNoteTitle.setText(alreadyAvailableNote.getTitle());
         inputNoteText.setText(alreadyAvailableNote.getNoteText());
         displayImage();
-
     }
-
-
 
     private void saveNote() {
         //validations
@@ -402,6 +406,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         //getting id of new note from already available note,as OnConflictStrategy is set to "replace" in noteDao,hence it will be updated
         if (alreadyAvailableNote != null) {
             note.setId(alreadyAvailableNote.getId());
+            displayImageUpdateNotes();
         }
 
         //use async task to save in room db
@@ -461,7 +466,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutMisc.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#ff69b4";
+                selectedColor = "#3a52fc";
                 imageColor2.setImageResource(R.drawable.ic_done);
                 imageColor1.setImageResource(0);
                 imageColor3.setImageResource(0);
@@ -497,7 +502,7 @@ public class CreateNoteActivity extends AppCompatActivity {
                 case "#808080":
                     layoutMisc.findViewById(R.id.viewColor1).performClick();
                     break;
-                case "#ff69b4":
+                case "#3a52fc":
                     layoutMisc.findViewById(R.id.viewColor2).performClick();
                     break;
                 case "#fd8e38":
@@ -532,7 +537,10 @@ public class CreateNoteActivity extends AppCompatActivity {
         LinearLayout layout = (LinearLayout) findViewById(R.id.imageLayout);
         layout.removeAllViews();
         File[] files = targetDirector.listFiles();
-
+        if(files==null)
+        {
+            return;
+        }
 
         for (File file : files) {
 
@@ -549,6 +557,43 @@ public class CreateNoteActivity extends AppCompatActivity {
             image.setImageBitmap(bmp);
         }
     }
+
+    //display image for updated file
+    protected void displayImageUpdateNotes(){
+
+
+        String ExternalStorageDirectoryPath = Environment
+                .getExternalStorageDirectory()
+                .getAbsolutePath();
+
+        // String targetPath = ExternalStorageDirectoryPath + "/DCIM/App";
+        String targetPath = ExternalStorageDirectoryPath + "/DCIM/Notin/"+inputNoteTitle.getText().toString();
+        ArrayList<String> images = new ArrayList<String>();
+        File targetDirector = new File(targetPath);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.imageLayout);
+        layout.removeAllViews();
+        File[] files = targetDirector.listFiles();
+
+        if(files==null)
+        {
+            return;
+        }
+        for (File file : files) {
+
+            String filepath = file.getAbsolutePath();
+            Bitmap bmp = BitmapFactory.decodeFile(filepath);
+
+            ImageView image = new ImageView(this);
+            image.setLayoutParams(new android.view.ViewGroup.LayoutParams(1000, 1000));
+            image.setMaxHeight(500);
+            image.setMaxWidth(500);
+            // Adds the view to the layout
+            layout.addView(image);
+
+            image.setImageBitmap(bmp);
+        }
+    }
+
 
     //Set up the camera intent
     private void dispatchTakePictureIntent() throws InterruptedException {
@@ -600,7 +645,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             boolean s = new File(storageDir.getPath()).mkdirs();
 
             if(!s){
-                Toast.makeText(this,"NOt created!",
+                Toast.makeText(this,"Please give storage permission!",
                         Toast.LENGTH_SHORT).show();
                 Log.v("not", "not created");
             }
@@ -624,7 +669,5 @@ public class CreateNoteActivity extends AppCompatActivity {
         return image;
 
     }
-
-
 }
 

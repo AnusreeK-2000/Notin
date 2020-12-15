@@ -74,15 +74,23 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
     String sem_f;
     String email_f;
 
+    String teacher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
 
-        reference = FirebaseDatabase.getInstance().getReference().child("Member");
+        sharedPref = new SharedPrefUtil(UpdateProfile.this);
+        teacher = sharedPref.getString("teacher");
+        if (teacher.equals("1")) {
+            reference = FirebaseDatabase.getInstance().getReference().child("Faculty");
+        } else {
+            reference = FirebaseDatabase.getInstance().getReference().child("Member");
+        }
+
         member = new Member();
 
-        sharedPref = new SharedPrefUtil(UpdateProfile.this);
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -118,6 +126,11 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
         // Spinner element
         spinnerSem = (Spinner) findViewById(R.id.spinnerSemPro);
         spinnerDept = (Spinner) findViewById(R.id.spinnerDeptPro);
+
+        if(teacher.equals("1")){
+            findViewById(R.id.spinnerLayoutU).setVisibility(View.GONE);
+            spinnerSem.setVisibility(View.GONE);
+        }
 
         // Spinner click listener
         spinnerSem.setOnItemSelectedListener(this);
@@ -162,7 +175,11 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
         spinnerSem.setAdapter(dataAdapterSem);
         spinnerDept.setAdapter(dataAdapterDept);
 
-        String s = sharedPref.getString("userSem");
+        String s="";
+        if(!teacher.equals("1")){
+            s = sharedPref.getString("userSem");
+        }
+
         String d = sharedPref.getString("userDept");
         if (s != null && d != null){
             spinnerDept.setSelection(categoriesDept.indexOf(d));
@@ -211,9 +228,13 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
 //                email_f = snapshot.child("email").getValue().toString();
 
                 String name_f = sharedPref.getString("userName");
-                String sem_f = sharedPref.getString("userSem");
+
                 String email_f = sharedPref.getString("userEmail");
                 String dept_f = sharedPref.getString("userDept");
+
+                if(!teacher.equals("1")){
+                    String sem_f = sharedPref.getString("userSem");
+                }
 
                 tv_username.setText(name_f);
                 userr.setText(name_f);
@@ -291,7 +312,7 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
 //                String dept = deptt.getText().toString().trim();
                 String dept = itemdept;
 //                String semester = sem.getText().toString().trim();
-                String semester = itemsem;
+
 
                 tv_username.setText(name);
                 email3.setText(email);
@@ -303,14 +324,20 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
                 member.setName(name);
                 member.setDepartment(dept);
                 member.setEmail(email);
-                member.setSemester(semester);
+
 
                 reference.child(currentUser.getUid()).setValue(member);
 
                 sharedPref.saveString("userEmail",email);
                 sharedPref.saveString("userName",name);
                 sharedPref.saveString("userDept",dept);
-                sharedPref.saveString("userSem",semester);
+
+
+                if(!teacher.equals("1")){
+                    String semester = itemsem;
+                    member.setSemester(semester);
+                    sharedPref.saveString("userSem",semester);
+                }
 
 //                String b = sharedPref.getString("userDept");
 
@@ -322,10 +349,16 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
     //Navigation Drawer Functions
     private void navigationDrawer() {
 
+//        String teacher = sharedPref.getString("teacher");
+
         //Navigation Drawer
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_home);
+
+        if(teacher.equals("1")){
+            navigationView.getMenu().setGroupVisible(R.id.pri, false);
+        }
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
