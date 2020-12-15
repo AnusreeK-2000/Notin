@@ -31,7 +31,9 @@
         import android.widget.TextView;
         import android.widget.Toast;
 
+        import androidx.annotation.NonNull;
         import androidx.appcompat.app.AppCompatActivity;
+        import androidx.core.app.ActivityCompat;
         import androidx.core.content.ContextCompat;
         import androidx.core.content.FileProvider;
 
@@ -46,6 +48,7 @@
         import java.text.SimpleDateFormat;
         import java.util.ArrayList;
         import java.util.Date;
+        import java.util.List;
         import java.util.Locale;
 
         import static android.view.MotionEvent.*;
@@ -68,7 +71,10 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     //For camera
     static final int REQUEST_IMAGE_CAPTURE=100;
-    static final int IMAGE_DISPLAY=22;
+    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 101;
+
+    //For microphone
+    final private int MICROPHONE_PERMISSIONS = 102;
 
     int i=1;
     private View viewTitle;
@@ -77,15 +83,59 @@ public class CreateNoteActivity extends AppCompatActivity {
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
-                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:" + getPackageName()));
-                startActivity(intent);
-                finish();
+
+                ActivityCompat.requestPermissions(CreateNoteActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, MICROPHONE_PERMISSIONS);
             }
+
+
         }
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+       /* if(requestCode==CAMERA_PERMISSION && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+
+                try {
+                    dispatchTakePictureIntent();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                Toast.makeText(CreateNoteActivity.this,"Camera Permission not provided",Toast.LENGTH_SHORT).show();
+            }*/
+
+        switch (requestCode) {
+
+                //If neither permission given
+            case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+                if (grantResults.length > 0) {
+                    boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeExternalfile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if(cameraPermission && writeExternalfile)
+                    {
+                        try {
+                            dispatchTakePictureIntent();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(CreateNoteActivity.this,"Camera and storage Permission not provided",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+
+            case MICROPHONE_PERMISSIONS:
+                if(requestCode==MICROPHONE_PERMISSIONS && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+
+                }
+                else{
+                    Toast.makeText(CreateNoteActivity.this,"Microphone Permission not provided",Toast.LENGTH_SHORT).show();
+                }
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,13 +228,30 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         //Camera BUTTON FUNCTION
         camera.setOnClickListener(new View.OnClickListener() {
+            List<String> permissionsNeeded = new ArrayList<String>();
+
+            final List<String> permissionsList = new ArrayList<String>();
             @Override
             public void onClick(View v) {
-                try {
-                    dispatchTakePictureIntent();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                //Both camera and storage not provided
+                if (ContextCompat.checkSelfPermission(CreateNoteActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) + ContextCompat
+                        .checkSelfPermission(CreateNoteActivity.this,
+                                Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        dispatchTakePictureIntent();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+
+
+                else{
+                    ActivityCompat.requestPermissions(CreateNoteActivity.this,new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                }
+
 
             }
         });
@@ -271,6 +338,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
 
         findViewById(R.id.audio_btn).setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -536,7 +604,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             boolean s = new File(storageDir.getPath()).mkdirs();
 
             if(!s){
-                Toast.makeText(this,"NOt created!",
+                Toast.makeText(this,"Please give storage permission!",
                         Toast.LENGTH_SHORT).show();
                 Log.v("not", "not created");
             }
