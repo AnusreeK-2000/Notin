@@ -406,6 +406,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         //getting id of new note from already available note,as OnConflictStrategy is set to "replace" in noteDao,hence it will be updated
         if (alreadyAvailableNote != null) {
             note.setId(alreadyAvailableNote.getId());
+            displayImageUpdateNotes();
         }
 
         //use async task to save in room db
@@ -536,7 +537,10 @@ public class CreateNoteActivity extends AppCompatActivity {
         LinearLayout layout = (LinearLayout) findViewById(R.id.imageLayout);
         layout.removeAllViews();
         File[] files = targetDirector.listFiles();
-
+        if(files==null)
+        {
+            return;
+        }
 
         for (File file : files) {
 
@@ -553,6 +557,43 @@ public class CreateNoteActivity extends AppCompatActivity {
             image.setImageBitmap(bmp);
         }
     }
+
+    //display image for updated file
+    protected void displayImageUpdateNotes(){
+
+
+        String ExternalStorageDirectoryPath = Environment
+                .getExternalStorageDirectory()
+                .getAbsolutePath();
+
+        // String targetPath = ExternalStorageDirectoryPath + "/DCIM/App";
+        String targetPath = ExternalStorageDirectoryPath + "/DCIM/Notin/"+inputNoteTitle.getText().toString();
+        ArrayList<String> images = new ArrayList<String>();
+        File targetDirector = new File(targetPath);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.imageLayout);
+        layout.removeAllViews();
+        File[] files = targetDirector.listFiles();
+
+        if(files==null)
+        {
+            return;
+        }
+        for (File file : files) {
+
+            String filepath = file.getAbsolutePath();
+            Bitmap bmp = BitmapFactory.decodeFile(filepath);
+
+            ImageView image = new ImageView(this);
+            image.setLayoutParams(new android.view.ViewGroup.LayoutParams(1000, 1000));
+            image.setMaxHeight(500);
+            image.setMaxWidth(500);
+            // Adds the view to the layout
+            layout.addView(image);
+
+            image.setImageBitmap(bmp);
+        }
+    }
+
 
     //Set up the camera intent
     private void dispatchTakePictureIntent() throws InterruptedException {
