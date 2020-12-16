@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Teacher.LectureUploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.NotesAdapter;
 import com.example.notin.database.NotesDatabase;
@@ -277,6 +278,9 @@ notesAdapter.cancelTimer();
         if(teacher.equals("1")){
             navigationView.getMenu().setGroupVisible(R.id.pri, false);
         }
+        else{
+            navigationView.getMenu().setGroupVisible(R.id.priTeach, false);
+        }
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -326,6 +330,9 @@ notesAdapter.cancelTimer();
                 break;
             case R.id.create_note:
                 startActivity(new Intent(this, CreateNoteActivity.class));
+                break;
+            case R.id.upload_lec_video:
+                startActivity(new Intent(this, LectureUploadActivity.class));
                 break;
 
             default:

@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Teacher.LectureUploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.entities.Member;
 import com.google.android.material.navigation.NavigationView;
@@ -359,6 +360,9 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
         if(teacher.equals("1")){
             navigationView.getMenu().setGroupVisible(R.id.pri, false);
         }
+        else{
+            navigationView.getMenu().setGroupVisible(R.id.priTeach, false);
+        }
 
         menuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -409,6 +413,10 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
                 break;
+            case R.id.upload_lec_video:
+                startActivity(new Intent(this, LectureUploadActivity.class));
+                break;
+
 
             default:
                 return true;

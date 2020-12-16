@@ -17,6 +17,10 @@
             android:id="@+id/nav_upload"
             android:icon="@drawable/ic_cloud_upload_24px"
             android:title="@string/menu_upload" />
+        <item
+            android:id="@+id/videos_uploaded"
+            android:icon="@drawable/ic_video"
+            android:title="@string/videos_uploaded" />
 
     </group>
     <item android:title="Private">
@@ -30,6 +34,19 @@
                     android:id="@+id/create_note"
                     android:icon="@drawable/ic_create_note"
                     android:title="@string/create_notes" />
+
+            </menu>
+        </group>
+    </item>
+
+    <item android:title="Private">
+        <group android:checkableBehavior="single" android:id="@+id/priTeach">
+            <menu>
+                <item
+                    android:id="@+id/upload_lec_video"
+                    android:icon="@drawable/ic_cloud_upload_24px"
+                    android:title="@string/upload_lec_video" />
+
 
             </menu>
         </group>
