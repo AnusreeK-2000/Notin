@@ -452,6 +452,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     private void saveNote() {
         //validations
+
         if (inputNoteTitle.getText().toString().trim().isEmpty()) {
             Toast.makeText(this, "Note title can't be empty!", Toast.LENGTH_SHORT).show();
             return;
@@ -459,6 +460,8 @@ public class CreateNoteActivity extends AppCompatActivity {
             Toast.makeText(this, "Note can't be empty!", Toast.LENGTH_SHORT).show();
             return;
         }
+
+
         //saving to db
         final Note note = new Note();
         note.setTitle(inputNoteTitle.getText().toString());
@@ -469,8 +472,8 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         //getting id of new note from already available note,as OnConflictStrategy is set to "replace" in noteDao,hence it will be updated
         if (alreadyAvailableNote != null) {
-            Toast.makeText(this, "already exist!", Toast.LENGTH_SHORT).show();
             note.setId(alreadyAvailableNote.getId());
+            updateImagePath(inputNoteTitle.getText().toString());
         }
 
         //use async task to save in room db
@@ -586,6 +589,13 @@ public class CreateNoteActivity extends AppCompatActivity {
         gradientDrawable.setColor((Color.parseColor(selectedColor)));
     }
 
+    protected void updateImagePath(String s){
+        File storageDir= new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM),"Notin/"+alreadyAvailableNote.getTitle());
+        File toDir=new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM),"Notin/"+s);
+        storageDir.renameTo(toDir);
+    }
     //To display saved photos
     protected void displayImage(){
 
@@ -645,7 +655,7 @@ public class CreateNoteActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                Toast.makeText(this,"THis is not working!",
+                Toast.makeText(this,"Try again!",
                         Toast.LENGTH_SHORT).show();
             }
             // Continue only if the File was successfully created
