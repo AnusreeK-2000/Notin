@@ -6,6 +6,31 @@
     <string name="search_notes">Search Notes</string>
     <string name="each_subj">Course 1</string>
 
+    <string name="first_slide_title">Are you a Student?</string>
+
+
+    <!-- Strings for On Boarding Screen -->
+
+    <!--Titles-->
+    <string name="second_slide_title">Are you a Teacher?</string>
+    <string name="first_slide_desc">You can view and upload notes as per your department and semester as well as create your own notes. </string>
+
+    <!--Descriptions-->
+    <string name="second_slide_desc">You can view the notes available as per your department as well as upload your notes.</string>
+    <string name="next_btn">Next</string>
+
+    <!--Buttons-->
+    <string name="let_get_started">Lets Get Started</string>
+    <string name="menu_home">Home</string>
+
+    <!-- Menu items -->
+    <string name="menu_profile">Profile</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_upload">Upload</string>
+    <string name="your_notes">Your Notes</string>
+    <string name="create_notes">Create Note</string>
+    <string name="videos_uploaded">Lecture Videos</string>
+    <string name="upload_lec_video">Upload Video</string>
     <string-array name="Subjects">
         <item>Algorithms</item>
         <item>Data Structures</item>
@@ -17,28 +42,5 @@
         <item>Artificial Intelligence</item>
         <item>Other</item>
     </string-array>
-
-
-    <!-- Strings for On Boarding Screen -->
-
-    <!--Titles-->
-    <string name="first_slide_title">Are you a Student?</string>
-    <string name="second_slide_title">Are you a Teacher?</string>
-
-    <!--Descriptions-->
-    <string name="first_slide_desc">You can view and upload notes as per your department and semester as well as create your own notes. </string>
-    <string name="second_slide_desc">You can view the notes available as per your department as well as upload your notes.</string>
-
-    <!--Buttons-->
-    <string name="next_btn">Next</string>
-    <string name="let_get_started">Lets Get Started</string>
-
-    <!-- Menu items -->
-    <string name="menu_home">Home</string>
-    <string name="menu_profile">Profile</string>
-    <string name="menu_logout">Logout</string>
-    <string name="menu_upload">Upload</string>
-    <string name="your_notes">Your Notes</string>
-    <string name="create_notes">Create Note</string>
     <!--    <string name="default_web_client_id">100</string>-->
 </resources>
