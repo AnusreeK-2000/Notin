@@ -22,7 +22,7 @@ public class ShowVideo extends AppCompatActivity {
 
     public RecyclerView mRecyclerView2;
     FirebaseDatabase mFirebaseDatabase2;
-    DatabaseReference mref2;
+    Query mref2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class ShowVideo extends AppCompatActivity {
         mRecyclerView2.setHasFixedSize(true);
         mRecyclerView2.setLayoutManager(new LinearLayoutManager(this));
         mFirebaseDatabase2 = FirebaseDatabase.getInstance();
-        mref2 = mFirebaseDatabase2.getReference("Videos");
+        mref2 = mFirebaseDatabase2.getReference().child("Videos").orderByChild("subject").equalTo(name);
 
     }
     @Override

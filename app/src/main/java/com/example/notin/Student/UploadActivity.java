@@ -79,6 +79,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     Uri pdfUri;//urls meant for local storage
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    String author;
 
     //database references
 
@@ -138,6 +139,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         menuIcon = findViewById(R.id.menu_icon);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        author = sharedPref.getString("userName");
         navigationDrawer();
 
 
@@ -249,7 +251,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
                         while(!uri.isComplete());
                         Uri url =uri.getResult();
 
-                        UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text,currentUser.getDisplayName());
+                        UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text,author);
 
                         database.getReference().child("Notes").child(database.getReference().push().getKey()).setValue(details);
                         progressDialog.dismiss();

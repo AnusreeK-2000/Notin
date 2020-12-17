@@ -81,6 +81,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
     Uri videoUri;//urls meant for local storage
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    String author;
 
     //database references
 
@@ -132,6 +133,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
         menuIcon = findViewById(R.id.menu_icon);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        author = sharedPref.getString("userName");
         navigationDrawer();
 
 
@@ -220,7 +222,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
                         while(!uri.isComplete());
                         Uri url =uri.getResult();
 
-                        UploadVideoDetails details=new UploadVideoDetails(Title.getText().toString(),url.toString(),text,currentUser.getDisplayName());
+                        UploadVideoDetails details=new UploadVideoDetails(text,Title.getText().toString(),url.toString(),author);
 
                         database.getReference().child("Videos").child(database.getReference().push().getKey()).setValue(details);
                         progressDialog.dismiss();
