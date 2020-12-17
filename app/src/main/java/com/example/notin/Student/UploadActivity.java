@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Teacher.CoursesRecyclerViewActivity;
 import com.example.notin.Teacher.LectureUploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.RecentNotesAdapter;
@@ -436,6 +437,9 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
                 break;
             case R.id.upload_lec_video:
                 startActivity(new Intent(this, LectureUploadActivity.class));
+                break;
+            case R.id.videos_uploaded:
+                startActivity(new Intent(this, CoursesRecyclerViewActivity.class));
                 break;
 
             default:
