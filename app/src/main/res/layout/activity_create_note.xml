@@ -217,7 +217,7 @@
 
                 <EditText
                     android:id="@+id/description_text"
-                    android:layout_width="400dp"
+                    android:layout_width="match_parent"
                     android:layout_height="331dp"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
@@ -228,6 +228,7 @@
                     android:layout_marginTop="214dp"
                     android:layout_marginBottom="157dp"
                     android:gravity="top"
+                    android:layout_marginStart="5dp"
                     android:hint="Description"
                     android:inputType="text|textMultiLine"
                     android:scrollbars="vertical"

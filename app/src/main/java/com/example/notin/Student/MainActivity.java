@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
 import com.example.notin.R;
+import com.example.notin.Teacher.CoursesRecyclerViewActivity;
 import com.example.notin.Teacher.LectureUploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.NotesAdapter;
@@ -151,10 +152,10 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
         notesRecyclerView.setAdapter(notesAdapter);
 
 
-        getNotes(REQUEST_CODE_SHOW_ALL_NOTES,false);
+        getNotes(REQUEST_CODE_SHOW_ALL_NOTES, false);
 
         //for search notes
-        EditText inputSearch=findViewById(R.id.searchField);
+        EditText inputSearch = findViewById(R.id.searchField);
         inputSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -163,12 +164,12 @@ public class MainActivity extends AppCompatActivity implements NotesListener, Na
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-notesAdapter.cancelTimer();
+                notesAdapter.cancelTimer();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(noteList.size()!=0){
+                if (noteList.size() != 0) {
                     notesAdapter.searchNotes(s.toString());
                 }
 
@@ -186,7 +187,7 @@ notesAdapter.cancelTimer();
 
     }
 
-    private void getNotes(final int requestCode,final boolean isNoteDeleted ) {
+    private void getNotes(final int requestCode, final boolean isNoteDeleted) {
         @SuppressLint("StaticFieldLeak")
         class GetNotesTask extends AsyncTask<Void, Void, List<Note>> {
             @Override
@@ -217,9 +218,9 @@ notesAdapter.cancelTimer();
                     notesRecyclerView.smoothScrollToPosition(0);
                 } else if (requestCode == REQUEST_CODE_UPDATE_NOTE) {
                     noteList.remove(noteClickedPosition);
-                    if(isNoteDeleted){
+                    if (isNoteDeleted) {
                         notesAdapter.notifyItemRemoved(noteClickedPosition);
-                    }else{
+                    } else {
                         noteList.add(noteClickedPosition, notes.get(noteClickedPosition));
                         notesAdapter.notifyItemChanged(noteClickedPosition);
 
@@ -236,10 +237,10 @@ notesAdapter.cancelTimer();
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_ADD_NOTE && resultCode == RESULT_OK) {
-            getNotes(REQUEST_CODE_ADD_NOTE,false);
+            getNotes(REQUEST_CODE_ADD_NOTE, false);
         } else if (requestCode == REQUEST_CODE_UPDATE_NOTE && resultCode == RESULT_OK) {
             if (data != null) {
-                getNotes(REQUEST_CODE_UPDATE_NOTE,data.getBooleanExtra("isNoteDeleted",false));
+                getNotes(REQUEST_CODE_UPDATE_NOTE, data.getBooleanExtra("isNoteDeleted", false));
             }
 
         }
@@ -252,11 +253,10 @@ notesAdapter.cancelTimer();
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
         String n = sharedPref.getString("userName");
-        if(currentUser != null){
-            if(n != null){
+        if (currentUser != null) {
+            if (n != null) {
                 tv_username.setText(n);
-            }
-            else if (currentUser.getDisplayName() != "") {
+            } else if (currentUser.getDisplayName() != "") {
                 tv_username.setText(currentUser.getDisplayName());
             } else {
                 tv_username.setText("Hello User!");
@@ -275,10 +275,9 @@ notesAdapter.cancelTimer();
         navigationView.setCheckedItem(R.id.nav_home);
 
         String teacher = sharedPref.getString("teacher");
-        if(teacher.equals("1")){
+        if (teacher.equals("1")) {
             navigationView.getMenu().setGroupVisible(R.id.pri, false);
-        }
-        else{
+        } else {
             navigationView.getMenu().setGroupVisible(R.id.priTeach, false);
         }
 
@@ -315,7 +314,8 @@ notesAdapter.cancelTimer();
                 editor.putBoolean("firstTime", firstTime);
                 editor.apply();
                 Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);break;
+                startActivity(intent);
+                break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
                 break;
@@ -333,6 +333,9 @@ notesAdapter.cancelTimer();
                 break;
             case R.id.upload_lec_video:
                 startActivity(new Intent(this, LectureUploadActivity.class));
+                break;
+            case R.id.videos_uploaded:
+                startActivity(new Intent(this, CoursesRecyclerViewActivity.class));
                 break;
 
             default:

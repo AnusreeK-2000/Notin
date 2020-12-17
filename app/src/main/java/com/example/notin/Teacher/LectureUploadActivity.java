@@ -60,7 +60,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LectureUploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener{
+public class LectureUploadActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final int PICK_VIDEO = 1;
     private Button Upload;
@@ -100,13 +100,13 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
         setContentView(R.layout.activity_lecture_upload);
         sharedPref = new SharedPrefUtil(LectureUploadActivity.this);
         String dept = sharedPref.getString("userDept");
-        final Query nm= FirebaseDatabase.getInstance().getReference().child("Courses").orderByChild("department").equalTo(dept);
+        final Query nm = FirebaseDatabase.getInstance().getReference().child("Courses").orderByChild("department").equalTo(dept);
         nm.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final List<String> subj = new ArrayList<String>();
-                if (dataSnapshot.exists()){
-                    for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
                         String subjName = areaSnapshot.child("name").getValue(String.class);
                         subj.add(subjName);
                     }
@@ -139,57 +139,58 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
 
         //Storage in firebase database
 
-        storage=FirebaseStorage.getInstance();//returns an obj of firebase storage
-        database=FirebaseDatabase.getInstance();//returns an obj of Firebase Database
+        storage = FirebaseStorage.getInstance();//returns an obj of firebase storage
+        database = FirebaseDatabase.getInstance();//returns an obj of Firebase Database
 
-        selectFile=findViewById(R.id.choose_btn);
-        Upload=findViewById(R.id.upload_video_btn);
-        Title=findViewById(R.id.TitleVideo);
+        selectFile = findViewById(R.id.choose_btn);
+        Upload = findViewById(R.id.upload_video_btn);
+        Title = findViewById(R.id.TitleVideo);
 //        Cancel=findViewById(R.id.Cancel_btn);
         Title.addTextChangedListener(TitleEntry);
         Upload.setEnabled(false);
 //        Cancel.setEnabled(false);
 
-        Notification=findViewById(R.id.textViewVid);
+        Notification = findViewById(R.id.textViewVid);
 
         //Add file button listener
         selectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(ContextCompat.checkSelfPermission(LectureUploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){
+                if (ContextCompat.checkSelfPermission(LectureUploadActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     selectVideo();
-                }
-                else{
-                    ActivityCompat.requestPermissions(LectureUploadActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},9);
+                } else {
+                    ActivityCompat.requestPermissions(LectureUploadActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 9);
                 }
             }
         });
-
 
 
         //Onclick listener of Upload button
         Upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(videoUri!=null)//the user has selected file
+                if (videoUri != null)//the user has selected file
                     uploadFile(videoUri);
                 else
-                    Toast.makeText(LectureUploadActivity.this,"Select a video",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LectureUploadActivity.this, "Select a video", Toast.LENGTH_SHORT).show();
             }
         });
 
     }
-    private String getExt(Uri uri){
+
+    private String getExt(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        return  mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         text = parent.getItemAtPosition(position).toString();
         // Toast.makeText(parent.getContext(),text, Toast.LENGTH_SHORT).show();
     }
+
     //For the spinner
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
@@ -203,8 +204,8 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
 
     //Function to upload file to firebase database
 
-    private void uploadFile(Uri videoUri){
-        progressDialog=new ProgressDialog(this);
+    private void uploadFile(Uri videoUri) {
+        progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setProgress(0);
@@ -212,21 +213,21 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
 
 
         //final String fileName=System.currentTimeMillis()+"";
-        StorageReference storageReference=storage.getReference().child("Videos/"+System.currentTimeMillis()+ "." + getExt(videoUri));//returns root path
+        StorageReference storageReference = storage.getReference().child("Videos/" + System.currentTimeMillis() + "." + getExt(videoUri));//returns root path
         storageReference.putFile(videoUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                        Task<Uri> uri=taskSnapshot.getStorage().getDownloadUrl();
-                        while(!uri.isComplete());
-                        Uri url =uri.getResult();
+                        Task<Uri> uri = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!uri.isComplete()) ;
+                        Uri url = uri.getResult();
 
-                        UploadVideoDetails details=new UploadVideoDetails(text,Title.getText().toString(),url.toString(),author);
+                        UploadVideoDetails details = new UploadVideoDetails(text, Title.getText().toString(), url.toString(), author);
 
                         database.getReference().child("Videos").child(database.getReference().push().getKey()).setValue(details);
                         progressDialog.dismiss();
-                        Toast.makeText(LectureUploadActivity.this,"Video successfully uploaded",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LectureUploadActivity.this, "Video successfully uploaded", Toast.LENGTH_SHORT).show();
                         Notification.setText("Nothing Uploaded");
                         Title.setText("");
                         Upload.setEnabled(false);
@@ -234,13 +235,13 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LectureUploadActivity.this,"Video not successfully uploaded",Toast.LENGTH_SHORT).show();
+                Toast.makeText(LectureUploadActivity.this, "Video not successfully uploaded", Toast.LENGTH_SHORT).show();
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
                 //track the progress of the upload
-                int currentProgress=(int)(100*snapshot.getBytesTransferred()/snapshot.getTotalByteCount());
+                int currentProgress = (int) (100 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
                 progressDialog.setProgress(currentProgress);
 
             }
@@ -249,21 +250,19 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
     }
 
 
-
     //Checking for grant of permissions
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode==9 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 9 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             selectVideo();
-        }
-        else{
-            Toast.makeText(LectureUploadActivity.this,"Permission not provided",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(LectureUploadActivity.this, "Permission not provided", Toast.LENGTH_SHORT).show();
         }
     }
 
     //Video selecting function
 
-    private void selectVideo(){
+    private void selectVideo() {
 
         //to offer user to select a file using file manager, using an intent
 
@@ -272,7 +271,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
         intent.setAction(Intent.ACTION_GET_CONTENT);
         //startActivityForResult(intent,PICK_VIDEO);
 
-        startActivityForResult(intent,90);
+        startActivityForResult(intent, 90);
 
     }
 
@@ -283,12 +282,11 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
 
         //resultcode to check if action is completed successfully
         //data to check if file is selected or not
-        if(requestCode==90 && resultCode==RESULT_OK && data!=null){
-            videoUri=data.getData();
-            Notification.setText("Video File selected: "+data.getData().getLastPathSegment());
-        }
-        else{
-            Toast.makeText(LectureUploadActivity.this,"Please select a video",Toast.LENGTH_SHORT).show();
+        if (requestCode == 90 && resultCode == RESULT_OK && data != null) {
+            videoUri = data.getData();
+            Notification.setText("Video File selected: " + data.getData().getLastPathSegment());
+        } else {
+            Toast.makeText(LectureUploadActivity.this, "Please select a video", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -317,8 +315,6 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
     };
 
 
-
-
     //Navigation Drawer Functions
     private void navigationDrawer() {
 
@@ -326,11 +322,10 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
         View header = navigationView.getHeaderView(0);
         TextView tv_username = header.findViewById(R.id.nav_username);
         String n = sharedPref.getString("userName");
-        if(currentUser.getDisplayName() != null){
-            if(n != null){
+        if (currentUser.getDisplayName() != null) {
+            if (n != null) {
                 tv_username.setText(n);
-            }
-            else if (currentUser.getDisplayName() != "") {
+            } else if (currentUser.getDisplayName() != "") {
                 tv_username.setText(currentUser.getDisplayName());
             } else {
                 tv_username.setText("Hello User!");
@@ -350,7 +345,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
         navigationView.setCheckedItem(R.id.nav_home);
 
         String teacher = sharedPref.getString("teacher");
-        if(teacher.equals("1")){
+        if (teacher.equals("1")) {
             navigationView.getMenu().setGroupVisible(R.id.pri, false);
         }
 
@@ -387,12 +382,13 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
                 editor.putBoolean("firstTime", firstTime);
                 editor.apply();
                 Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);break;
+                startActivity(intent);
+                break;
             case R.id.nav_profile:
                 startActivity(new Intent(this, UpdateProfile.class));
                 break;
             case R.id.nav_upload:
-                startActivity(new Intent(this,UploadActivity.class));
+                startActivity(new Intent(this, UploadActivity.class));
                 break;
             case R.id.your_notes:
                 startActivity(new Intent(this, MainActivity.class));
@@ -402,6 +398,12 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
                 break;
             case R.id.nav_home:
                 startActivity(new Intent(this, Home.class));
+                break;
+            case R.id.upload_lec_video:
+                startActivity(new Intent(this, LectureUploadActivity.class));
+                break;
+            case R.id.videos_uploaded:
+                startActivity(new Intent(this, CoursesRecyclerViewActivity.class));
                 break;
 
             default:

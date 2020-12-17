@@ -279,6 +279,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 startActivity(new Intent(this, CoursesRecyclerViewActivity.class));
                 break;
 
+
             default:
                 return true;
         }
