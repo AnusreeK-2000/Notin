@@ -89,7 +89,7 @@ public class CoursesRecyclerViewActivity extends AppCompatActivity implements Na
             @Override
             public void onClick(View view) {
                 if(sharedPref.getString("teacher").equals("1")){
-                        startActivity(new Intent(CoursesRecyclerViewActivity.this, UploadVideoDetails.class));
+                        startActivity(new Intent(CoursesRecyclerViewActivity.this, LectureUploadActivity.class));
                 }else {
                     startActivity(new Intent(CoursesRecyclerViewActivity.this, UploadActivity.class));
                 }
