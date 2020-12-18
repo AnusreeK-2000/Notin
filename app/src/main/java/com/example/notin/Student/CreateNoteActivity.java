@@ -399,7 +399,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             if (dialogDelete.getWindow() != null) {
                 dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             }
-            view.findViewById(R.id.Imagedelete).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     @SuppressLint("StaticFieldLeak")
@@ -425,7 +425,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
                 }
             });
-            view.findViewById(R.id.Imagecancel).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dialogDelete.dismiss();
