@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class UploadNotesActivity extends AppCompatActivity {
 
@@ -34,7 +36,12 @@ public class UploadNotesActivity extends AppCompatActivity {
     public static ArrayList<File> mfiles=new ArrayList<>();
     File folder;
     RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
+    //RecyclerView.Adapter adapter;
+    MyListAdapter adapter;
+    final ArrayList<UploadPDFDetails> notesHelper = new ArrayList<UploadPDFDetails>();
+    public List<String>tempo1;
+    public List<String>temp2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,10 +96,25 @@ public class UploadNotesActivity extends AppCompatActivity {
  */
         //permission method..
         permission();
-
-
         recyclerView = (RecyclerView) findViewById(R.id.uploadRecyclerView);
         uploadNotesView(name);
+
+
+        //for search notes
+        SearchView searchView=(SearchView)findViewById(R.id.search_pdf);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+               adapter.searchnotes(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.searchnotes(newText);
+                return false;
+            }
+        });
         /*
         MyListAdapter adapter = new MyListAdapter(this,myListData);
         recyclerView.setHasFixedSize(true);
@@ -102,25 +124,27 @@ public class UploadNotesActivity extends AppCompatActivity {
          */
     }
 
-    private void uploadNotesView(String name) {
-        final ArrayList<UploadPDFDetails> notesHelper = new ArrayList<UploadPDFDetails>();
 
-        final Query nm= FirebaseDatabase.getInstance().getReference().child("Notes")
+    private void uploadNotesView(String name) {
+
+
+        Query nm= FirebaseDatabase.getInstance().getReference().child("Notes")
                 .orderByChild("subject")
                 .equalTo(name);
 
-        nm.addListenerForSingleValueEvent(new ValueEventListener() {
+        nm.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()){
                         UploadPDFDetails l=postSnapshot.getValue(UploadPDFDetails.class);
                         notesHelper.add(l);
+
                     }
                     adapter = new MyListAdapter(UploadNotesActivity.this,notesHelper);
                     recyclerView.setLayoutManager(new LinearLayoutManager(UploadNotesActivity.this, LinearLayoutManager.VERTICAL, false));
                     recyclerView.setAdapter(adapter);
-                    //System.out.println(notesHelper);
+                    recyclerView.setHasFixedSize(true);
 
                 }
             }
@@ -130,8 +154,6 @@ public class UploadNotesActivity extends AppCompatActivity {
 
             }
         });
-
-        recyclerView.setHasFixedSize(true);
 
     }
 

@@ -2,6 +2,8 @@ package com.example.notin.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notin.R;
-import com.example.notin.Student.UploadNotesActivity;
 import com.example.notin.Teacher.ShowVideo;
 import com.example.notin.entities.Courses;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VideoCoursesAdapter extends RecyclerView.Adapter<VideoCoursesAdapter.CoursesHolder>  {
     ArrayList<Courses> coursesList;
+    private Timer timer;
+    ArrayList<Courses>list2;
 
     public VideoCoursesAdapter(ArrayList<Courses> coursesList) {
+
         this.coursesList = coursesList;
+        list2=coursesList;
     }
 
 
@@ -68,6 +75,40 @@ public class VideoCoursesAdapter extends RecyclerView.Adapter<VideoCoursesAdapte
 
 
     }
+    public void searchNotes(final String searchKeyword){
+        timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(searchKeyword.trim().isEmpty()){
+                    coursesList=list2;
+                }
+                else{
+                    ArrayList<Courses>temp=new ArrayList<>();
+                    for(Courses note:list2){
+                        if(note.getName().toLowerCase().contains(searchKeyword.toLowerCase())){
+                            temp.add(note);
+                        }
+                    }
+                    coursesList=temp;
+                }
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
+
+            }
+        },500);
+    }
+
+    public void cancelTimer(){
+        if(timer!=null){
+            timer.cancel();
+        }
+    }
+
 
 
 

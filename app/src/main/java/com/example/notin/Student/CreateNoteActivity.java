@@ -534,7 +534,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutMisc.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#3a52fc";
+                selectedColor = "#ff69b4";
                 imageColor2.setImageResource(R.drawable.ic_done);
                 imageColor1.setImageResource(0);
                 imageColor3.setImageResource(0);
@@ -570,7 +570,7 @@ public class CreateNoteActivity extends AppCompatActivity {
                 case "#808080":
                     layoutMisc.findViewById(R.id.viewColor1).performClick();
                     break;
-                case "#3a52fc":
+                case "#ff69b4":
                     layoutMisc.findViewById(R.id.viewColor2).performClick();
                     break;
                 case "#fd8e38":
