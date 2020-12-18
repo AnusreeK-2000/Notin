@@ -37,7 +37,7 @@
     android:layout_width="@dimen/_170sdp"
     android:layout_height="wrap_content"
     android:layout_below="@id/pdfTitle"
-    android:textColor="@color/colorTextHint"
+    android:textColor="#000"
     android:textSize="@dimen/_12ssp"
     android:layout_marginLeft="@dimen/_20sdp"
     android:layout_toRightOf="@id/img_pdf"

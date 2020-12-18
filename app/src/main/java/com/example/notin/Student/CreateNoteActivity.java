@@ -1,4 +1,3 @@
-
 package com.example.notin.Student;
 
 import android.Manifest;
@@ -534,7 +533,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutMisc.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#ff69b4";
+                selectedColor = "#e7c4f8";
                 imageColor2.setImageResource(R.drawable.ic_done);
                 imageColor1.setImageResource(0);
                 imageColor3.setImageResource(0);
@@ -556,7 +555,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         layoutMisc.findViewById(R.id.viewColor4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#ff4842";
+                selectedColor = "#e15764";
                 imageColor4.setImageResource(R.drawable.ic_done);
                 imageColor2.setImageResource(0);
                 imageColor3.setImageResource(0);
@@ -570,13 +569,13 @@ public class CreateNoteActivity extends AppCompatActivity {
                 case "#808080":
                     layoutMisc.findViewById(R.id.viewColor1).performClick();
                     break;
-                case "#ff69b4":
+                case "#e7c4f8":
                     layoutMisc.findViewById(R.id.viewColor2).performClick();
                     break;
                 case "#fd8e38":
                     layoutMisc.findViewById(R.id.viewColor3).performClick();
                     break;
-                case "#ff4842":
+                case "#e15764":
                     layoutMisc.findViewById(R.id.viewColor4).performClick();
 
             }
@@ -805,4 +804,3 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     }
 }
-

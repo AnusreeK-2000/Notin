@@ -76,6 +76,8 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
     String sem_f;
     String email_f;
 
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
     String teacher;
 
     @Override
@@ -311,39 +313,52 @@ public class UpdateProfile extends AppCompatActivity implements NavigationView.O
             public void onClick(View view) {
                 String name = namee.getText().toString().trim();
                 String email = emaill.getText().toString().trim();
-//                String dept = deptt.getText().toString().trim();
                 String dept = itemdept;
-//                String semester = sem.getText().toString().trim();
+                if (email.matches(emailPattern) && email.length() > 0 && name.length() > 0)
+                {
+                    tv_username.setText(name);
+                    email3.setText(email);
+                    TextView user = findViewById(R.id.full_name);
+                    user.setText(name);
+                    TextView emailedit = findViewById(R.id.email);
+                    emailedit.setText(email);
+
+                    member.setName(name);
+                    member.setDepartment(dept);
+                    member.setEmail(email);
 
 
-                tv_username.setText(name);
-                email3.setText(email);
-                TextView user = findViewById(R.id.full_name);
-                user.setText(name);
-                TextView emailedit = findViewById(R.id.email);
-                emailedit.setText(email);
+                    reference.child(currentUser.getUid()).setValue(member);
 
-                member.setName(name);
-                member.setDepartment(dept);
-                member.setEmail(email);
+                    sharedPref.saveString("userEmail",email);
+                    sharedPref.saveString("userName",name);
+                    sharedPref.saveString("userDept",dept);
 
 
-                reference.child(currentUser.getUid()).setValue(member);
-
-                sharedPref.saveString("userEmail",email);
-                sharedPref.saveString("userName",name);
-                sharedPref.saveString("userDept",dept);
-
-
-                if(!teacher.equals("1")){
-                    String semester = itemsem;
-                    member.setSemester(semester);
-                    sharedPref.saveString("userSem",semester);
-                }
+                    if(!teacher.equals("1")){
+                        String semester = itemsem;
+                        member.setSemester(semester);
+                        sharedPref.saveString("userSem",semester);
+                    }
 
 //                String b = sharedPref.getString("userDept");
 
-                Toast.makeText(UpdateProfile.this, "Your profile has been successfully updated" , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UpdateProfile.this, "Your profile has been successfully updated" , Toast.LENGTH_SHORT).show();
+                } else if (email.length() == 0 ){
+                    Toast.makeText(getApplicationContext(),"Email can't be empty",Toast.LENGTH_SHORT).show();
+                } else if(name.length() == 0){
+                    Toast.makeText(getApplicationContext(),"Name can't be empty",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"Invalid details entered",Toast.LENGTH_SHORT).show();
+                }
+//                String dept = deptt.getText().toString().trim();
+
+//                String semester = sem.getText().toString().trim();
+
+
+
             }
         });
     }
