@@ -26,7 +26,7 @@
     <!-- Menu items -->
     <string name="menu_profile">Profile</string>
     <string name="menu_logout">Logout</string>
-    <string name="menu_upload">Upload</string>
+    <string name="menu_upload">Upload Notes</string>
     <string name="your_notes">Your Notes</string>
     <string name="create_notes">Create Note</string>
     <string name="videos_uploaded">Lecture Videos</string>

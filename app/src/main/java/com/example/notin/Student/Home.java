@@ -55,6 +55,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     //Variables
     ImageView menuIcon;
+    ImageView leadToUpload;
 
     //Drawer Menu
     DrawerLayout drawerLayout;
@@ -83,6 +84,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
+        leadToUpload = findViewById(R.id.lead_to_upload);
+        leadToUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this, UploadActivity.class));
+            }
+        });
 
         navigationDrawer();
 

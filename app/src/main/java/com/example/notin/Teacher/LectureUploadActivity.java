@@ -152,6 +152,7 @@ public class LectureUploadActivity extends AppCompatActivity implements AdapterV
 
         Notification = findViewById(R.id.textViewVid);
 
+
         //Add file button listener
         selectFile.setOnClickListener(new View.OnClickListener() {
             @Override

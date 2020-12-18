@@ -49,6 +49,7 @@ public class ShowVideo extends AppCompatActivity implements NavigationView.OnNav
     String name,url;
 
     ImageView menuIcon;
+    ImageView leadToUpload;
 
     //Drawer Menu
     DrawerLayout drawerLayout;
@@ -75,6 +76,17 @@ public class ShowVideo extends AppCompatActivity implements NavigationView.OnNav
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         menuIcon = findViewById(R.id.menu_icon);
+        leadToUpload = findViewById(R.id.lead_to_upload);
+        leadToUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(sharedPref.getString("teacher").equals("1")){
+                    startActivity(new Intent(ShowVideo.this, UploadVideoDetails.class));
+                }else {
+                    startActivity(new Intent(ShowVideo.this, UploadActivity.class));
+                }
+            }
+        });
 
         navigationDrawer();
 

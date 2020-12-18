@@ -29,6 +29,7 @@ import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.VideoCoursesAdapter;
 import com.example.notin.entities.Courses;
+import com.example.notin.entities.UploadVideoDetails;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,6 +48,7 @@ public class CoursesRecyclerViewActivity extends AppCompatActivity implements Na
 
     //Variables
     ImageView menuIcon;
+    ImageView leadToUpload;
 
     //Drawer Menu
     DrawerLayout drawerLayout;
@@ -78,6 +80,17 @@ public class CoursesRecyclerViewActivity extends AppCompatActivity implements Na
 
         //Hooks
         coursesRecycler = findViewById(R.id.courses_view);
+        leadToUpload = findViewById(R.id.lead_to_upload);
+        leadToUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(sharedPref.getString("teacher").equals("1")){
+                        startActivity(new Intent(CoursesRecyclerViewActivity.this, UploadVideoDetails.class));
+                }else {
+                    startActivity(new Intent(CoursesRecyclerViewActivity.this, UploadActivity.class));
+                }
+            }
+        });
 
         //Functions will be executed automatically when this activity will be created
 
