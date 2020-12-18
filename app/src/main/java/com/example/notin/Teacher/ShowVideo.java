@@ -46,6 +46,7 @@ public class ShowVideo extends AppCompatActivity implements NavigationView.OnNav
     Boolean firstTime;
     SharedPrefUtil sharedPref;
     FirebaseUser currentUser;
+    String name,url;
 
     ImageView menuIcon;
 
@@ -94,6 +95,24 @@ public class ShowVideo extends AppCompatActivity implements NavigationView.OnNav
                     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UploadVideoDetails model) {
 
                         holder.setDetails2(getApplication(),model.getName(),model.getUrl());
+                        holder.setOnClicklistener(new ViewHolder.Clicklistener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                name = getItem(position).getName();
+                                url = getItem(position).getUrl();
+                                Intent intent = new Intent(ShowVideo.this,Fullscreen.class);
+                                intent.putExtra("nam",name);
+                                intent.putExtra("ur",url);
+                                startActivity(intent);
+
+
+                            }
+
+                            @Override
+                            public void onItemLongClick(View view, int position) {
+                                name = getItem(position).getName();
+                            }
+                        });
                     }
 
                     @NonNull
