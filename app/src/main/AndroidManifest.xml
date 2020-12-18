@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Teacher.Fullscreen"></activity>
+        <activity android:name=".Teacher.Fullscreen" />
         <activity android:name=".Teacher.ShowVideo" />
         <activity android:name=".Teacher.CoursesRecyclerViewActivity" />
         <activity android:name=".Teacher.LectureUploadActivity" />
@@ -22,7 +22,11 @@
         <activity
             android:name=".Student.CreateNoteActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan" >
+            <meta-data
+                android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+                android:value="ocr" />
+        </activity>
         <activity android:name=".Student.pdfViewerActivity" />
         <activity android:name=".Student.UploadNotesActivity" />
         <activity android:name=".Common.OnBoarding" />
@@ -38,6 +42,8 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
