@@ -330,7 +330,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
                 //displaying the first match
                 if (matches != null)
-                    inputNoteText.setText(inputNoteText.getText() + "\n" + matches.get(0) + "\n");
+                    inputNoteText.setText(inputNoteText.getText() + matches.get(0) + "\n");
             }
 
             @Override
