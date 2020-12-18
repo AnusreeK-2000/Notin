@@ -65,6 +65,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
     private Note alreadyAvailableNote;
     private AlertDialog dialogDelete;
+    private AlertDialog DeleteImageDialog;
 
     //Add camera btn
     ImageView camera;
@@ -397,7 +398,7 @@ public class CreateNoteActivity extends AppCompatActivity {
             if(dialogDelete.getWindow()!=null){
                 dialogDelete.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             }
-            view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.Imagedelete).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     @SuppressLint("StaticFieldLeak")
@@ -423,7 +424,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
                 }
             });
-            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.Imagecancel).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dialogDelete.dismiss();
@@ -589,6 +590,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         gradientDrawable.setColor((Color.parseColor(selectedColor)));
     }
 
+    //For when Title is edited
     protected void updateImagePath(String s){
         File storageDir= new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM),"Notin/"+alreadyAvailableNote.getTitle());
@@ -618,7 +620,7 @@ public class CreateNoteActivity extends AppCompatActivity {
 
         for (File file : files) {
 
-            String filepath = file.getAbsolutePath();
+            final String filepath = file.getAbsolutePath();
             Bitmap bmp = BitmapFactory.decodeFile(filepath);
             if(bmp==null){
                 file.delete();
@@ -626,13 +628,70 @@ public class CreateNoteActivity extends AppCompatActivity {
             }
             ImageView image = new ImageView(this);
             image.setLayoutParams(new android.view.ViewGroup.LayoutParams(1000, 1000));
+            //To generate view id
+            image.setId(View.generateViewId());
+
+
             image.setMaxHeight(500);
             image.setMaxWidth(500);
             // Adds the view to the layout
             layout.addView(image);
 
             image.setImageBitmap(bmp);
+            Toast.makeText(this,Integer.toString(image.getId()),Toast.LENGTH_LONG);
 
+         //   ImageView tempImg1,tempImg2,tempImg3,tempImg4,tempImg5,tempImg6,tempImg7,tempImg8,tempImg9,tempImg10;
+           final ImageView tempImg1 = (ImageView) findViewById(image.getId());
+            tempImg1.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    showDeleteImageDialog(filepath);
+                    Log.i("Onclick", filepath);
+                    return true;
+                }
+            });
+
+
+        }
+    }
+
+    //FOR DELETION OF IMAGE
+    private void showDeleteImageDialog(final String filepath) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(CreateNoteActivity.this);
+            View view = LayoutInflater.from(this).inflate(
+                    R.layout.delete_image,
+                    (ViewGroup) findViewById(R.id.deleteImage)
+            );
+            builder.setView(view);
+            DeleteImageDialog = builder.create();
+            if (DeleteImageDialog.getWindow() != null) {
+                DeleteImageDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            view.findViewById(R.id.Imagedelete).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String ExternalStorageDirectoryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+                    String targetPath = ExternalStorageDirectoryPath + "/DCIM/Notin/" + inputNoteTitle.getText().toString();
+
+                    File dir = getFilesDir();
+                    File file = new File(filepath);
+                    boolean deleted = file.delete();
+                    displayImage();
+                    DeleteImageDialog.dismiss();
+                }
+            });
+
+
+            view.findViewById(R.id.Imagecancel).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    DeleteImageDialog.dismiss();
+                }
+            });
+
+            DeleteImageDialog.show();
         }
     }
 
