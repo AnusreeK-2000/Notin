@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,13 +29,11 @@ import com.example.notin.Utils.SharedPrefUtil;
 import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.RecentNotesAdapter;
 import com.example.notin.entities.Courses;
-import com.example.notin.entities.RecentNotes;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -63,15 +64,21 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     RecyclerView  recentNotesRecycler, coursesRecycler;
 //    private FirebaseFirestore db;
     RecyclerView.Adapter adapter;
+    CoursesAdapter adapter1;
 
     SharedPrefUtil sharedPref;
     FirebaseUser currentUser;
+    final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_home);
+
+        //department
+        sharedPref = new SharedPrefUtil(Home.this);
+        String department = sharedPref.getString("userDept");
 
 //        db = FirebaseFirestore.getInstance();
 
@@ -92,13 +99,35 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         //Functions will be executed automatically when this activity will be created
 
-        recentNotesRecycler();
+        recentNotesRecycler(department);
         coursesRecycler();
+
+        //for searching courses
+        EditText dis=findViewById(R.id.search_course);
+        dis.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter1.cancelTimer();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (coursesHelperClasses.size() != 0) {
+                    adapter1.searchNotes(s.toString());
+                }
+
+            }
+        });
 
 
     }
 
-    private void recentNotesRecycler(){
+    private void recentNotesRecycler(String department){
         final ArrayList<UploadPDFDetails> recentNotesHelperClasses = new ArrayList<>();
 //        recentNotesHelperClasses.add(new RecentNotes("Dynamic Programming"));
 //        recentNotesHelperClasses.add(new RecentNotes("Digital Transmission"));
@@ -111,6 +140,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 //                .setQuery(query, RecentNotes.class)
 //                .build();
         final Query nm= FirebaseDatabase.getInstance().getReference().child("Notes")
+                .orderByChild("dept")
+                .equalTo(department)
                 .limitToLast(7);
         nm.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -141,7 +172,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void coursesRecycler(){
-        final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
+
         String dept = sharedPref.getString("userDept");
 //        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
 //        coursesHelperClasses.add(new Courses("Computer Networks"));
@@ -162,9 +193,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                                       }
 //                                                      adapter=new MyAdapter(listData);
 //                                                      rv.setAdapter(adapter);
-                                                      adapter = new CoursesAdapter(coursesHelperClasses);
+                                                      adapter1 = new CoursesAdapter(coursesHelperClasses);
                                                       coursesRecycler.setLayoutManager(new LinearLayoutManager(Home.this, LinearLayoutManager.VERTICAL, false));
-                                                      coursesRecycler.setAdapter(adapter);
+                                                      coursesRecycler.setAdapter(adapter1);
                                                       System.out.println(coursesHelperClasses);
 
                                                   }

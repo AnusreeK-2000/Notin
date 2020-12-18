@@ -5,6 +5,7 @@ public class UploadPDFDetails {
     public String name;
     public String url;
     public String author;
+    public String dept;
 
     public UploadPDFDetails() {
     }
@@ -29,17 +30,25 @@ public class UploadPDFDetails {
         this.author = author;
     }
 
-    public UploadPDFDetails(String name, String url, String spinner, String author) {
+    public UploadPDFDetails(String name, String url, String spinner, String author,String dept) {
         this.name = name;
         this.url = url;
         this.subject=spinner;
         this.author=author;
+        this.dept=dept;
     }
 
     public String getName() {
         return name;
     }
 
+    public String getDept() {
+        return dept;
+    }
+
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
 
     public String getUrl() {
         return url;

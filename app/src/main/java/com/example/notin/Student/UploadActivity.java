@@ -29,7 +29,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
@@ -37,8 +36,6 @@ import com.example.notin.R;
 import com.example.notin.Teacher.CoursesRecyclerViewActivity;
 import com.example.notin.Teacher.LectureUploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
-import com.example.notin.adapters.RecentNotesAdapter;
-import com.example.notin.entities.RecentNotes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -81,6 +78,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
     String author;
+    String depart;
 
     //database references
 
@@ -141,6 +139,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         author = sharedPref.getString("userName");
+        depart = sharedPref.getString("userDept");
         navigationDrawer();
 
 
@@ -252,7 +251,7 @@ public class UploadActivity extends AppCompatActivity implements AdapterView.OnI
                         while(!uri.isComplete());
                         Uri url =uri.getResult();
 
-                        UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text,author);
+                        UploadPDFDetails details=new UploadPDFDetails(Title.getText().toString(),url.toString(),text,author,depart);
 
                         database.getReference().child("Notes").child(database.getReference().push().getKey()).setValue(details);
                         progressDialog.dismiss();

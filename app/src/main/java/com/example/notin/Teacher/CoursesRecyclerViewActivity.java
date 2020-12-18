@@ -1,21 +1,24 @@
 package com.example.notin.Teacher;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.notin.Common.LoginActivity;
@@ -26,7 +29,6 @@ import com.example.notin.Student.MainActivity;
 import com.example.notin.Student.UpdateProfile;
 import com.example.notin.Student.UploadActivity;
 import com.example.notin.Utils.SharedPrefUtil;
-import com.example.notin.adapters.CoursesAdapter;
 import com.example.notin.adapters.VideoCoursesAdapter;
 import com.example.notin.entities.Courses;
 import com.google.android.material.navigation.NavigationView;
@@ -54,7 +56,9 @@ public class CoursesRecyclerViewActivity extends AppCompatActivity implements Na
 
     RecyclerView recentNotesRecycler, coursesRecycler;
     //    private FirebaseFirestore db;
-    RecyclerView.Adapter adapter;
+    //RecyclerView.Adapter adapter;
+    VideoCoursesAdapter adapter;
+    final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
 
     SharedPrefUtil sharedPref;
     FirebaseUser currentUser;
@@ -83,10 +87,30 @@ public class CoursesRecyclerViewActivity extends AppCompatActivity implements Na
 
 
         coursesRecycler();
+        //for searching courses
+        EditText dis=findViewById(R.id.video_courses);
+        dis.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.cancelTimer();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (coursesHelperClasses.size() != 0) {
+                    adapter.searchNotes(s.toString());
+                }
+
+            }
+        });
     }
 
     private void coursesRecycler(){
-        final ArrayList<Courses> coursesHelperClasses = new ArrayList<Courses>();
         String dept = sharedPref.getString("userDept");
 //        coursesHelperClasses.add(new Courses("Advanced Data Structures"));
 //        coursesHelperClasses.add(new Courses("Computer Networks"));
