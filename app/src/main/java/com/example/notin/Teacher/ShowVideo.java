@@ -81,7 +81,7 @@ public class ShowVideo extends AppCompatActivity implements NavigationView.OnNav
             @Override
             public void onClick(View view) {
                 if(sharedPref.getString("teacher").equals("1")){
-                    startActivity(new Intent(ShowVideo.this, UploadVideoDetails.class));
+                    startActivity(new Intent(ShowVideo.this, LectureUploadActivity.class));
                 }else {
                     startActivity(new Intent(ShowVideo.this, UploadActivity.class));
                 }

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.content.Intent;
@@ -76,6 +77,13 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             reference = FirebaseDatabase.getInstance().getReference().child("Member");
         }
 
+        ImageView goBoard = findViewById(R.id.go_board);
+        goBoard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this, OnBoarding.class));
+            }
+        });
         member = new Member();
         //--for mobile sign in
         findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
