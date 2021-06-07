@@ -40,8 +40,8 @@
   </tr>
   <tr>
      <td><img src="images/LoginScreen.jpeg" width="250" height="450"></td>
-    <td><img src="images/PrivateNotes.jpeg" width="250" height="450"></td>
     <td><img src="images/CreateNotes.jpeg" width="250" height="450"></td>
+    <td><img src="images/PrivateNotes.jpeg" width="250" height="450"></td>
 
   </tr>
  </table>
@@ -51,7 +51,7 @@
 
 <table>
   <tr>
-    <td>Detext Text and Delete Image</td>
+    <td>Detect Text and Delete Image</td>
     <td>Course List View</td>
      <td>Notes List View and Download</td>
 
@@ -80,7 +80,7 @@
  </table>
 
   ------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
 <table>
   <tr>
      <td>Home Screen</td>
